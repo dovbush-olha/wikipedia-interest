@@ -1,0 +1,151 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q925%7CQ308%7CQ15869%7CQ165745%7CQ52162&props=descriptions%7Csitelinks&languages=en&sitefilter=ukwiki%7Ccswiki%7Cplwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q925": {
+        "type": "item",
+        "id": "Q925",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "chemical element with symbol Hg and atomic number 80"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Rtuť",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Rtęć",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Ртуть",
+            "badges": []
+          }
+        }
+      },
+      "Q308": {
+        "type": "item",
+        "id": "Q308",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "first planet from the Solar System and smallest among all, tellurian and with extreme temperatures"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Merkur (planeta)",
+            "badges": [
+              "Q17437796"
+            ]
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Merkury",
+            "badges": [
+              "Q17437796"
+            ]
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Меркурій (планета)",
+            "badges": [
+              "Q17437798"
+            ]
+          }
+        }
+      },
+      "Q15869": {
+        "type": "item",
+        "id": "Q15869",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "British singer, songwriter and musician, frontman of the rock band Queen (1946–1991)"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Freddie Mercury",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Freddie Mercury",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Фредді Мерк'юрі",
+            "badges": []
+          }
+        }
+      },
+      "Q165745": {
+        "type": "item",
+        "id": "Q165745",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "American record label"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Mercury Records",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Mercury Records",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Mercury Records",
+            "badges": []
+          }
+        }
+      },
+      "Q52162": {
+        "type": "item",
+        "id": "Q52162",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "first human spaceflight program of the United States"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Program Mercury",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Program Mercury",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Меркурій (космічна програма)",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T14:39:15.725Z"
+}

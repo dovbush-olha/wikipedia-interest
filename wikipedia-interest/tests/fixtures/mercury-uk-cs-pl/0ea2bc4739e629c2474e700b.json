@@ -1,0 +1,107 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&generator=search&gsrsearch=Mercury&gsrnamespace=0&gsrlimit=10&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "continue": {
+      "gsroffset": 10,
+      "continue": "gsroffset||"
+    },
+    "query": {
+      "pages": [
+        {
+          "pageid": 19007,
+          "ns": 0,
+          "title": "Mercury",
+          "index": 1,
+          "pageprops": {
+            "disambiguation": "",
+            "wikibase_item": "Q48397"
+          }
+        },
+        {
+          "pageid": 19694,
+          "ns": 0,
+          "title": "Mercury (planet)",
+          "index": 3,
+          "pageprops": {
+            "wikibase_item": "Q308"
+          }
+        },
+        {
+          "pageid": 19812,
+          "ns": 0,
+          "title": "Project Mercury",
+          "index": 6,
+          "pageprops": {
+            "wikibase_item": "Q52162"
+          }
+        },
+        {
+          "pageid": 37417,
+          "ns": 0,
+          "title": "Mercury (mythology)",
+          "index": 8,
+          "pageprops": {
+            "wikibase_item": "Q1150"
+          }
+        },
+        {
+          "pageid": 42068,
+          "ns": 0,
+          "title": "Freddie Mercury",
+          "index": 4,
+          "pageprops": {
+            "wikibase_item": "Q15869"
+          }
+        },
+        {
+          "pageid": 140995,
+          "ns": 0,
+          "title": "Mercury Prize",
+          "index": 7,
+          "pageprops": {
+            "wikibase_item": "Q501876"
+          }
+        },
+        {
+          "pageid": 256339,
+          "ns": 0,
+          "title": "Mercury (automobile)",
+          "index": 9,
+          "pageprops": {
+            "wikibase_item": "Q613883"
+          }
+        },
+        {
+          "pageid": 325909,
+          "ns": 0,
+          "title": "Mercury Records",
+          "index": 5,
+          "pageprops": {
+            "wikibase_item": "Q165745"
+          }
+        },
+        {
+          "pageid": 18617142,
+          "ns": 0,
+          "title": "Mercury (element)",
+          "index": 2,
+          "pageprops": {
+            "wikibase_item": "Q925"
+          }
+        },
+        {
+          "pageid": 43623248,
+          "ns": 0,
+          "title": "Mercury Marauder",
+          "index": 10,
+          "pageprops": {
+            "wikibase_item": "Q763495"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:11.081Z"
+}

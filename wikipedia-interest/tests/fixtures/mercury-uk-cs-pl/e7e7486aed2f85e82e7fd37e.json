@@ -1,0 +1,106 @@
+{
+  "url": "https://uk.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&generator=search&gsrsearch=%D0%9C%D0%B5%D1%80%D0%BA%D1%83%D1%80%D1%96%D1%8F&gsrnamespace=0&gsrlimit=10&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "continue": {
+      "gsroffset": 10,
+      "continue": "gsroffset||"
+    },
+    "query": {
+      "pages": [
+        {
+          "pageid": 1745,
+          "ns": 0,
+          "title": "Меркурій (планета)",
+          "index": 1,
+          "pageprops": {
+            "wikibase_item": "Q308"
+          }
+        },
+        {
+          "pageid": 8939,
+          "ns": 0,
+          "title": "Меркурій (міфологія)",
+          "index": 8,
+          "pageprops": {
+            "wikibase_item": "Q1150"
+          }
+        },
+        {
+          "pageid": 391308,
+          "ns": 0,
+          "title": "Гетьман Іван Мазепа (крейсер)",
+          "index": 5,
+          "pageprops": {
+            "wikibase_item": "Q2424120"
+          }
+        },
+        {
+          "pageid": 872945,
+          "ns": 0,
+          "title": "Колонізація Меркурія",
+          "index": 3,
+          "pageprops": {
+            "wikibase_item": "Q1140353"
+          }
+        },
+        {
+          "pageid": 967821,
+          "ns": 0,
+          "title": "Меркурій (космічна програма)",
+          "index": 4,
+          "pageprops": {
+            "wikibase_item": "Q52162"
+          }
+        },
+        {
+          "pageid": 2015824,
+          "ns": 0,
+          "title": "Зсув перигелію Меркурія",
+          "index": 9,
+          "pageprops": {
+            "wikibase_item": "Q3910034"
+          }
+        },
+        {
+          "pageid": 2127287,
+          "ns": 0,
+          "title": "Супутник Меркурія",
+          "index": 2,
+          "pageprops": {
+            "wikibase_item": "Q1349809"
+          }
+        },
+        {
+          "pageid": 2131980,
+          "ns": 0,
+          "title": "Магнітне поле Меркурія",
+          "index": 10,
+          "pageprops": {
+            "wikibase_item": "Q1752971"
+          }
+        },
+        {
+          "pageid": 2131985,
+          "ns": 0,
+          "title": "Атмосфера Меркурія",
+          "index": 7,
+          "pageprops": {
+            "wikibase_item": "Q245809"
+          }
+        },
+        {
+          "pageid": 2527578,
+          "ns": 0,
+          "title": "Дослідження Меркурія",
+          "index": 6,
+          "pageprops": {
+            "wikibase_item": "Q1188264"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:13.123Z"
+}

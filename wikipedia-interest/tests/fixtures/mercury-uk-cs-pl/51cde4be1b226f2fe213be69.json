@@ -1,0 +1,225 @@
+{
+  "url": "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/pl.wikipedia/all-access/user/Merkury/monthly/2024090100/2026083100",
+  "status": 200,
+  "body": {
+    "items": [
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2024090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4926
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2024100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6832
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2024110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7663
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2024120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7489
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7915
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7073
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8584
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7422
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5397
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3828
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3794
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3798
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3775
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6074
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6268
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2025120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4913
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4911
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4915
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6608
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8472
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5735
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3638
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3039
+      },
+      {
+        "project": "pl.wikipedia",
+        "article": "Merkury",
+        "granularity": "monthly",
+        "timestamp": "2026080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3063
+      }
+    ]
+  },
+  "fetched_at": "2026-09-27T14:39:14.778Z"
+}

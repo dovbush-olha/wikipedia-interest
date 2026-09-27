@@ -1,0 +1,30 @@
+{
+  "url": "https://cs.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Merkur+%28planeta%29",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 763,
+          "ns": 0,
+          "title": "Merkur (planeta)",
+          "redirects": [
+            {
+              "ns": 0,
+              "title": "☿"
+            },
+            {
+              "ns": 0,
+              "title": "Dobropán"
+            }
+          ]
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:14.503Z"
+}

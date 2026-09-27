@@ -1,0 +1,201 @@
+{
+  "url": "https://wikimedia.org/api/rest_v1/metrics/pageviews/aggregate/sk.wikipedia/all-access/user/monthly/2024090100/2026083100",
+  "status": 200,
+  "body": {
+    "items": [
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2024090100",
+        "views": 11732518
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2024100100",
+        "views": 13878017
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2024110100",
+        "views": 13862159
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2024120100",
+        "views": 13793872
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025010100",
+        "views": 17782216
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025020100",
+        "views": 15521291
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025030100",
+        "views": 16416142
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025040100",
+        "views": 14156955
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025050100",
+        "views": 14462986
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025060100",
+        "views": 10259889
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025070100",
+        "views": 12394646
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025080100",
+        "views": 11271460
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025090100",
+        "views": 11171244
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025100100",
+        "views": 12510958
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025110100",
+        "views": 20771807
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2025120100",
+        "views": 11431434
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026010100",
+        "views": 12237478
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026020100",
+        "views": 10633267
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026030100",
+        "views": 10134277
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026040100",
+        "views": 10179533
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026050100",
+        "views": 11642263
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026060100",
+        "views": 10662844
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026070100",
+        "views": 12244766
+      },
+      {
+        "project": "sk.wikipedia",
+        "access": "all-access",
+        "agent": "user",
+        "granularity": "monthly",
+        "timestamp": "2026080100",
+        "views": 11647669
+      }
+    ]
+  },
+  "fetched_at": "2026-09-27T14:39:27.937Z"
+}

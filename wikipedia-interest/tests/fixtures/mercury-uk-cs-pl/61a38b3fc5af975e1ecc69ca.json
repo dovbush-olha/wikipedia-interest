@@ -1,0 +1,21 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&titles=Mercury&redirects=1&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 19007,
+          "ns": 0,
+          "title": "Mercury",
+          "pageprops": {
+            "disambiguation": "",
+            "wikibase_item": "Q48397"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:10.772Z"
+}

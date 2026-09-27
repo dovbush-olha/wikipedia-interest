@@ -1,0 +1,20 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&titles=Mercury+%28planet%29&redirects=1&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 19694,
+          "ns": 0,
+          "title": "Mercury (planet)",
+          "pageprops": {
+            "wikibase_item": "Q308"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:13.798Z"
+}

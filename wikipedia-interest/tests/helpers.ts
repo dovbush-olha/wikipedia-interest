@@ -125,8 +125,13 @@ export function analyzeLongPeriod(
 // Q1666254 (intermittent fasting) in pl and cs, where pl has no article linked in Wikidata; Q333 (astronomy) in uk;
 // Q1860 (English language), the proxy for learning English, in uk, pl and cs. Also recorded: each topic as English and
 // Ukrainian --topic text, pl and cs in both orders and the needs_choice of "learning English", all for the paths a model may take,
-// and Q333 in uk and cs.
+// and Q333 in uk and cs. Also recorded for the follow-up that adds Slovak to the first example: Q1666254 and its English and
+// Ukrainian --topic text in pl, cs and sk, in four orders and both report languages; sk has no article linked in Wikidata either.
 export const TASK_EXAMPLES = fixtureEnv("task-examples", "2026-09-15");
+
+// The ambiguous topic of the evals, recorded on 2026-09-27 with a fixed "today" of 2026-09-15 in uk, cs and pl, in both report
+// languages: "Mercury" (en) and "Меркурій" (uk) are disambiguation pages with the planet Q308 among the candidates, and
+// "Mercury (planet)", "Меркурій (планета)" and Q308 are the planet itself. Used only by evals/mercury-ambiguous.
 
 /** Rewrites the run's analysis.json: for the report states no recorded fixture has, such as a raw/relative divergence. */
 export function editAnalysis(runDir: string, edit: (analysis: Analysis) => void): void {

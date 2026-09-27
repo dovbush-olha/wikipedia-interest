@@ -1,0 +1,107 @@
+{
+  "url": "https://uk.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&generator=search&gsrsearch=%D0%9C%D0%B5%D1%80%D0%BA%D1%83%D1%80%D1%96%D0%B9&gsrnamespace=0&gsrlimit=10&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "continue": {
+      "gsroffset": 10,
+      "continue": "gsroffset||"
+    },
+    "query": {
+      "pages": [
+        {
+          "pageid": 1745,
+          "ns": 0,
+          "title": "Меркурій (планета)",
+          "index": 3,
+          "pageprops": {
+            "wikibase_item": "Q308"
+          }
+        },
+        {
+          "pageid": 8939,
+          "ns": 0,
+          "title": "Меркурій (міфологія)",
+          "index": 4,
+          "pageprops": {
+            "wikibase_item": "Q1150"
+          }
+        },
+        {
+          "pageid": 46076,
+          "ns": 0,
+          "title": "Меркурій",
+          "index": 1,
+          "pageprops": {
+            "disambiguation": "",
+            "wikibase_item": "Q16675960"
+          }
+        },
+        {
+          "pageid": 414284,
+          "ns": 0,
+          "title": "Меркурій Печерський",
+          "index": 9,
+          "pageprops": {
+            "wikibase_item": "Q12122744"
+          }
+        },
+        {
+          "pageid": 967821,
+          "ns": 0,
+          "title": "Меркурій (космічна програма)",
+          "index": 2,
+          "pageprops": {
+            "wikibase_item": "Q52162"
+          }
+        },
+        {
+          "pageid": 1699342,
+          "ns": 0,
+          "title": "Меркурій Бригинський",
+          "index": 10,
+          "pageprops": {
+            "wikibase_item": "Q19402542"
+          }
+        },
+        {
+          "pageid": 1723223,
+          "ns": 0,
+          "title": "Меркурій (бриг)",
+          "index": 8,
+          "pageprops": {
+            "wikibase_item": "Q4291027"
+          }
+        },
+        {
+          "pageid": 1776017,
+          "ns": 0,
+          "title": "Меркурій в небезпеці",
+          "index": 5,
+          "pageprops": {
+            "wikibase_item": "Q267321"
+          }
+        },
+        {
+          "pageid": 1881436,
+          "ns": 0,
+          "title": "Меркурій-П",
+          "index": 7,
+          "pageprops": {
+            "wikibase_item": "Q4291017"
+          }
+        },
+        {
+          "pageid": 2219811,
+          "ns": 0,
+          "title": "Меркурій-сіті-тауер",
+          "index": 6,
+          "pageprops": {
+            "wikibase_item": "Q59483"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:12.068Z"
+}
