@@ -15,7 +15,10 @@ type CacheEntry = JsonResponse & { url: string; fetched_at: string };
 export type GetJsonOptions = {
   /** Refetch a live cache entry older than this; fixture caches never expire. Default: never. */
   maxAgeDays?: number;
-  /** Return a response without caching it, e.g. while the latest month is not published yet. */
+  /**
+   * Return a response without caching it, e.g. while the latest month is not published yet.
+   * Fixture recording ignores it: a replay must see exactly what Wikimedia answered.
+   */
   cacheIf?: (body: unknown) => boolean;
 };
 
@@ -36,7 +39,7 @@ export async function getJson(url: string, options: GetJsonOptions = {}): Promis
   }
 
   const response = await fetchJson(url);
-  if (options.cacheIf === undefined || options.cacheIf(response.body)) {
+  if (config.fixtures || options.cacheIf === undefined || options.cacheIf(response.body)) {
     writeCache(file, { url, ...response, fetched_at: new Date().toISOString() });
   }
   return response;

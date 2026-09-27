@@ -10,6 +10,9 @@ export type ReportLang = (typeof REPORT_LANGS)[number];
 
 export const ANALYSIS_FILE = "analysis.json";
 
+/** Language editions one analysis may compare: every one of them, assessed or not, takes room on the one-page report. */
+export const MAX_LANGUAGES = 6;
+
 export type MeasuredTopic = {
   qid: string;
   label: string;
@@ -37,7 +40,7 @@ export type Analysis = {
   status: "ok";
   user_question: string;
   report_lang: ReportLang;
-  /** The date (YYYY-MM-DD) the default period was derived from. */
+  /** The date (YYYY-MM-DD) the default --end was derived from. */
   as_of: string;
   measured_topic: MeasuredTopic;
   period: Period;

@@ -21,14 +21,27 @@ export async function editionViews(lang: string, period: Period): Promise<Monthl
     throw new UserError(`Wikimedia has no pageviews for ${lang}.wikipedia. Check the language code in --langs.`);
   }
   const views = toMonthly(body);
-  const missing = monthsOf(period).filter((month) => !views.has(month));
-  if (missing.length > 0) {
+  const months = monthsOf(period);
+  const missing = months.filter((month) => !views.has(month));
+  if (missing.length === 0) return views;
+
+  const lastPublished = months.findLast((month) => views.has(month));
+  const unpublished = lastPublished === undefined ? months : months.slice(months.indexOf(lastPublished) + 1);
+  if (missing.length === unpublished.length) {
+    // Only the latest months are missing: the usual state in the first days of a month.
+    const fix =
+      lastPublished === undefined
+        ? "Rerun later."
+        : `Rerun with --end ${lastPublished} to end at the last published month, or rerun later.`;
     throw new UserError(
-      `Wikimedia has not published ${lang}.wikipedia pageviews for ${missing.join(", ")} yet. ` +
-        "Monthly data usually appears within the first days of the next month; rerun later.",
+      `Wikimedia has not published ${lang}.wikipedia pageviews for ${missing.join(", ")} yet; ` +
+        `monthly data usually appears within the first days of the next month. ${fix}`,
     );
   }
-  return views;
+  throw new UserError(
+    `Wikimedia has no ${lang}.wikipedia pageviews for ${missing.join(", ")}, inside the requested period. ` +
+      `Rerun without ${lang} and tell the user ${lang} could not be assessed for this period.`,
+  );
 }
 
 /** Human views of one article title, per month. */
