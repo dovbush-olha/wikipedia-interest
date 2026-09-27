@@ -72,6 +72,16 @@ describe("evals", () => {
     }
   });
 
+  it("continues the follow-up from a first session of example 1 that the resume can walk whole", () => {
+    const history = readFileSync(join(EVALS_DIR, "follow-up-add-slovak", "first-session.jsonl"), "utf8").trim().split("\n");
+    const records = history.map((line) => JSON.parse(line));
+    // The resume walks parentUuid back from the last record and silently drops every record it does not reach.
+    records.forEach((record, i) => assert.equal(record.parentUuid, i === 0 ? null : records[i - 1].uuid, `record ${i}`));
+    const firstPrompt = readFileSync(join(EVALS_DIR, "fasting-pl-cs", "prompt.md"), "utf8").split("\n---\n")[1].trim();
+    assert.equal(records[0].message.content, firstPrompt);
+    assert.ok(records.some((record) => JSON.stringify(record.message.content).includes("scripts/report.ts")), "the first session ran report.ts");
+  });
+
   for (const [name, commands] of Object.entries(CASES)) {
     describe(name, () => {
       it("runs offline on a fixture folder of the skill with a fixed today", () => {
