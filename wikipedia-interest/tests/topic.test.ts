@@ -106,6 +106,15 @@ describe("analyze --topic, needs_choice", () => {
     }
   });
 
+  it("says how to measure a broader or narrower topic as an explicit proxy when no candidate fits", () => {
+    const result = analyze(["--topic", "learning English", "--langs", "uk,cs,pl"], TOPIC_SEARCH);
+    assert.equal(result.status, 0, result.stderr);
+
+    const { next_step } = JSON.parse(result.stdout);
+    assert.match(next_step, /as --topic and add --proxy-reason/);
+    assert.match(next_step, /tell the user/);
+  });
+
   it("returns even a single candidate for the agent to choose", () => {
     const query = '"alternate-day fasting" "periodic fasting" "5:2 diet"';
     const result = analyze(["--topic", query, "--langs", "uk,cs,pl"], TOPIC_SEARCH);

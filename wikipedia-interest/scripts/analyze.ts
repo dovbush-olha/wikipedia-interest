@@ -22,7 +22,9 @@ const NEEDS_CHOICE_NEXT_STEP =
   "Pick the candidate whose meaning matches the user's question; coverage comes second, and its missing_langs will not be assessed. " +
   "Rerun the same command with --qid <qid> in place of --topic and --topic-lang, and add --proxy-reason \"<how it differs>\" " +
   "if the candidate is broader or narrower than the topic of the question. " +
-  "If no candidate is both close in meaning and covered in enough of the requested languages, tell the user instead of measuring another topic.";
+  "If no candidate is close in meaning, a broader or narrower topic with its own article may still serve as an explicit proxy: " +
+  "rerun with that topic as --topic and add --proxy-reason. " +
+  "If no topic is both close in meaning and covered in enough of the requested languages, tell the user instead of measuring an unrelated one.";
 
 type TopicSource = { kind: "qid"; qid: string } | { kind: "topic"; query: string; topicLang: string };
 

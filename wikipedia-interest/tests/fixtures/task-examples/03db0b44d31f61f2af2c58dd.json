@@ -1,0 +1,51 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q1860&props=labels%7Cdescriptions%7Csitelinks&languages=uk%7Cen&sitefilter=ukwiki%7Ccswiki%7Cplwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q1860": {
+        "type": "item",
+        "id": "Q1860",
+        "labels": {
+          "uk": {
+            "language": "uk",
+            "value": "англійська мова"
+          },
+          "en": {
+            "language": "en",
+            "value": "English"
+          }
+        },
+        "descriptions": {
+          "uk": {
+            "language": "uk",
+            "value": "західногерманська мова, яка виникла в Англії"
+          },
+          "en": {
+            "language": "en",
+            "value": "West Germanic language"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Angličtina",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Język angielski",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Англійська мова",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T14:26:32.239Z"
+}
