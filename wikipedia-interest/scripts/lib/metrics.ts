@@ -10,6 +10,8 @@ const PER_MILLION = 1_000_000;
 const YEAR = 12;
 /** A relative attention growth within ±this many percent (inclusive) is a `flat` trend. */
 export const FLAT_GROWTH_PCT = 10;
+/** The index of the median relative attention of the first 12 months: the baseline of the chart. */
+export const BASELINE_INDEX = 100;
 
 /** heuristic_v1: recent months in the trend's direction needed for `high` and for `moderate`; fewer is `low`. */
 export const HIGH_RELIABILITY_MIN_MONTHS = 9;
@@ -96,8 +98,7 @@ export function languageMetrics(
   }
   const series = relativeAttentionSeries(months, article, edition);
   const raw = series.map((point) => point.article_views);
-  // Unrounded: in a large edition, rounding to the series' 3 decimals would distort growth and tie months.
-  const relative = series.map((point) => (point.article_views / point.edition_views) * PER_MILLION);
+  const relative = unroundedAttention(series);
   // Edition views are never zero, so a zero relative attention baseline is also a zero raw views baseline.
   const relativeGrowth = growthPct(relative);
   const rawGrowth = growthPct(raw);
@@ -191,6 +192,21 @@ function trendOf(growthPct: number): Trend {
 /** Each of the last 12 months minus the same month a year earlier. */
 function yearOverYear(values: number[]): number[] {
   return values.slice(-YEAR).map((value, i) => value - values[values.length - 2 * YEAR + i]);
+}
+
+/**
+ * Relative attention per month as an index: the median of the first 12 months of the requested period is BASELINE_INDEX,
+ * the same base as relative_attention_growth_pct. Only for an assessed series, whose first-year median is not zero.
+ */
+export function indexedAttention(series: MonthPoint[]): number[] {
+  const relative = unroundedAttention(series);
+  const baseline = median(relative.slice(0, YEAR));
+  return relative.map((value) => (value / baseline) * BASELINE_INDEX);
+}
+
+// Unrounded: in a large edition, rounding to the series' 3 decimals would distort growth, tie months and zero the baseline.
+function unroundedAttention(series: MonthPoint[]): number[] {
+  return series.map((point) => (point.article_views / point.edition_views) * PER_MILLION);
 }
 
 /** The months each growth compares: the first and the last 12 of the requested period. */

@@ -98,3 +98,16 @@ export function analyzeHistory(outDir: string, qid: string, lang: string, report
     ARTICLE_HISTORY,
   );
 }
+
+// 120 months (2016-09..2026-08), recorded on 2026-09-27 with a fixed "today" of 2026-09-15:
+// Q333 (astronomy) in uk, cs, pl, en, de and fr, all assessed, and Q1666254 (intermittent fasting) in cs, uk, en, de, fr and pl,
+// where cs and uk have a short history and pl has no article linked in Wikidata.
+export const LONG_PERIOD = fixtureEnv("report-120-months-6-langs", "2026-09-15");
+
+export function analyzeLongPeriod(outDir: string, qid: "Q333" | "Q1666254", langs: string, extraArgs: string[] = []): CliResult {
+  return runCli(
+    "analyze",
+    ["--qid", qid, "--langs", langs, "--months", "120", "--report-lang", "en", "--out-dir", outDir, ...extraArgs],
+    LONG_PERIOD,
+  );
+}
