@@ -13,7 +13,7 @@ export type ReportLang = (typeof REPORT_LANGS)[number];
 export const ANALYSIS_FILE = "analysis.json";
 
 /** Language editions one analysis may compare: every one of them, assessed or not, takes room on the one-page report. */
-export const MAX_LANGUAGES = 6;
+export const MAX_LANGUAGES = 4;
 
 /** One Wikidata item for every language of the analysis; a proxy is an explicit assumption of the report. */
 export type MeasuredTopic = WikidataTopic &

@@ -1,4 +1,5 @@
 import type { ReportLang } from "./analysis.ts";
+import type { Action } from "./conclusion.ts";
 import {
   BASELINE_INDEX,
   FLAT_GROWTH_PCT,
@@ -25,6 +26,13 @@ const en = {
   measuredTopic: "Measured topic",
   assumption: "Assumption",
   proxyAssumption: "the measured topic is a proxy for the topic of the question; it may be broader or narrower than that topic.",
+  recommendationHeading:
+    "Next-research recommendation based on the Wikipedia signal (interpretation, not a product launch decision)",
+  action: {
+    investigate_next: "investigate next",
+    consider: "consider",
+    lower_priority: "lower priority",
+  } satisfies Record<Action, string> as Record<Action, string>,
   chartTitle: "Relative attention index",
   chartBaseline: (compares: GrowthCompares) => `${BASELINE_INDEX} = median of ${range(compares.first_12_months)}`,
   columnLanguage: "Language edition",
@@ -95,6 +103,9 @@ const uk: Strings = {
   measuredTopic: "Виміряна тема",
   assumption: "Припущення",
   proxyAssumption: "виміряна тема - проксі теми питання, вона може бути ширшою або вужчою за тему питання.",
+  recommendationHeading:
+    "Рекомендація щодо наступного дослідження на основі Wikipedia-сигналу (інтерпретація, не рішення про запуск продукту)",
+  action: { investigate_next: "досліджувати наступною", consider: "розглянути", lower_priority: "нижчий пріоритет" },
   chartTitle: "Індекс відносної уваги",
   chartBaseline: (compares) => `${BASELINE_INDEX} = медіана за ${range(compares.first_12_months)}`,
   columnLanguage: "Мовний розділ",

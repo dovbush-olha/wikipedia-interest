@@ -2,6 +2,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { ANALYSIS_FILE, MAX_LANGUAGES, REPORT_LANGS, type Analysis, type LanguageResult, type ReportLang } from "./lib/analysis.ts";
+import { CONCLUSION_FILE } from "./lib/conclusion.ts";
 import { parseCliArgs, printJson, runMain, UserError } from "./lib/cli.ts";
 import { isInsideSkillDir, SKILL_DIR, today } from "./lib/env.ts";
 import { growthCompares, insufficientData, languageMetrics } from "./lib/metrics.ts";
@@ -123,7 +124,9 @@ await runMain(async () => {
     ...analysis,
     languages: languages.map(withoutSeries),
     files: { analysis: analysisFile },
-    next_step: `Run: node ${join(SKILL_DIR, "scripts", "report.ts")} --run-dir ${outDir}`,
+    next_step:
+      `Write ${join(outDir, CONCLUSION_FILE)} (no digits, assessed languages only), ` +
+      `then run: node ${join(SKILL_DIR, "scripts", "report.ts")} --run-dir ${outDir}`,
   });
 });
 

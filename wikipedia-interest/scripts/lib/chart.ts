@@ -12,7 +12,8 @@ const GRID = "#e6e6e6";
 const TITLE_SIZE = 10;
 const LABEL_SIZE = 7;
 const LEGEND_SIZE = 8;
-const PLOT_HEIGHT = 100;
+const LEGEND_GAP = 12;
+const PLOT_HEIGHT = 72;
 const SWATCH = 14;
 const LINE_WIDTH = 1.5;
 
@@ -32,7 +33,14 @@ export function drawChart(
   { left, top, width }: Omit<ChartArea, "height">,
 ): number {
   doc.fillColor(ink.text).fontSize(TITLE_SIZE).text(labels.title, left, top, { width });
-  const legendBottom = drawLegend(doc, series, labels, ink, left, doc.y + 4, width);
+  // The legend follows the title on its line when there is room, and goes under it otherwise.
+  const titleHeight = doc.currentLineHeight();
+  const legendLeft = left + doc.widthOfString(labels.title) + 16;
+  const besideTitle = legendLeft + legendWidth(doc, series, labels) <= left + width;
+  const legendTop = besideTitle ? top + (titleHeight - doc.fontSize(LEGEND_SIZE).currentLineHeight()) / 2 : doc.y + 4;
+  const legendBottom = besideTitle
+    ? Math.max(top + titleHeight, drawLegend(doc, series, labels, ink, legendLeft, legendTop, left + width - legendLeft))
+    : drawLegend(doc, series, labels, ink, left, legendTop, width);
 
   doc.fontSize(LABEL_SIZE);
   const labelHeight = doc.currentLineHeight();
@@ -57,6 +65,13 @@ function dashed(doc: PDFKit.PDFDocument, color: string): void {
   doc.lineWidth(1).strokeColor(color).dash(3, { space: 2 }).stroke().undash();
 }
 
+/** The width drawLegend takes: a swatch and code per series, then the baseline swatch and its label. */
+function legendWidth(doc: PDFKit.PDFDocument, series: ChartSeries[], labels: ChartLabels): number {
+  doc.fontSize(LEGEND_SIZE);
+  const entries = series.reduce((sum, s) => sum + SWATCH + 4 + doc.widthOfString(s.lang) + LEGEND_GAP, 0);
+  return entries + SWATCH + 4 + doc.widthOfString(labels.baseline);
+}
+
 /** A line swatch and the language code per series, then the dashed baseline with what 100 means. */
 function drawLegend(
   doc: PDFKit.PDFDocument,
@@ -74,7 +89,7 @@ function drawLegend(
     doc.moveTo(x, middle).lineTo(x + SWATCH, middle).lineWidth(LINE_WIDTH).strokeColor(SERIES_COLORS[i]).stroke();
     x += SWATCH + 4;
     doc.fillColor(ink.text).text(s.lang, x, top, { lineBreak: false });
-    x += doc.widthOfString(s.lang) + 12;
+    x += doc.widthOfString(s.lang) + LEGEND_GAP;
   });
   dashed(doc.moveTo(x, middle).lineTo(x + SWATCH, middle), ink.muted);
   x += SWATCH + 4;

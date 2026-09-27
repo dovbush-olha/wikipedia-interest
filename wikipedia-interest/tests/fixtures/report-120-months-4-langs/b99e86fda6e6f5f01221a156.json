@@ -1,0 +1,1089 @@
+{
+  "url": "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/de.wikipedia/all-access/user/Intermittierendes_Fasten/monthly/2016090100/2026083100",
+  "status": 200,
+  "body": {
+    "items": [
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2016090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5293
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2016100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6673
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2016110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5309
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2016120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4992
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 12431
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8728
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 14184
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9039
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9090
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9402
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 11906
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9447
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7390
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8931
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9044
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2017120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8025
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 24082
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 21816
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 21253
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 17687
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 19142
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 15223
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 14784
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 13898
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 13431
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 17156
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 12477
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2018120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9526
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 22256
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 13517
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 18140
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 15827
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 14796
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 13763
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 15536
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 16341
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 12469
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 13323
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 10799
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2019120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 10708
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 20236
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 12642
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 10517
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 12112
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 13239
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 10578
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9914
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8508
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8234
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6543
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 6073
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2020120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5596
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 10979
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7786
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 8286
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9517
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5867
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5233
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4165
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4149
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3974
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4345
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4006
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2021120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3907
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7102
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4554
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5428
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5189
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4594
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5223
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5776
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4739
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3758
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3307
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3459
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2022120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3395
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5433
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3831
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4562
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3937
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3928
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3972
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4353
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4113
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3258
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2943
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3164
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2023120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2967
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5137
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4826
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5121
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4566
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4501
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3763
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3661
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3363
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2504
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2810
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2893
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2024120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2470
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4953
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3061
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3691
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2736
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2398
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1726
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1654
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2160
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1614
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1565
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1567
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2025120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1346
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2161
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1749
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1569
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1081
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1462
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1442
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1809
+      },
+      {
+        "project": "de.wikipedia",
+        "article": "Intermittierendes_Fasten",
+        "granularity": "monthly",
+        "timestamp": "2026080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 1396
+      }
+    ]
+  },
+  "fetched_at": "2026-09-27T13:26:56.652Z"
+}

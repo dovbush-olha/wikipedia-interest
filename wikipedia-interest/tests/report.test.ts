@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { STRINGS } from "../scripts/lib/strings.ts";
 import {
   analyzeAstronomy,
@@ -14,6 +13,9 @@ import {
   FASTING,
   LONG_PERIOD,
   runCli,
+  readPdf,
+  runReport,
+  squash,
   tempDir,
 } from "./helpers.ts";
 
@@ -25,16 +27,6 @@ function analyze(reportLang: "uk" | "en", question: string): string {
   return runDir;
 }
 
-async function readPdf(file: string): Promise<{ pages: number; text: string }> {
-  const pdf = await getDocument({ data: new Uint8Array(readFileSync(file)) }).promise;
-  let text = "";
-  for (let n = 1; n <= pdf.numPages; n++) {
-    const content = await (await pdf.getPage(n)).getTextContent();
-    text += content.items.map((item) => ("str" in item ? item.str : "")).join("");
-  }
-  return { pages: pdf.numPages, text };
-}
-
 /** The page text before and after the heading of the not-assessed group, which follows the table. */
 function splitAtNotAssessed(text: string, heading: string): { table: string; notAssessed: string } {
   const at = text.indexOf(squash(heading));
@@ -42,17 +34,12 @@ function splitAtNotAssessed(text: string, heading: string): { table: string; not
   return { table: text.slice(0, at), notAssessed: text.slice(at) };
 }
 
-// Line wrapping and text runs split words unpredictably, so compare text without whitespace.
-function squash(text: string): string {
-  return text.replace(/\s+/g, "");
-}
-
 describe("report", () => {
   it("renders a one-page Ukrainian PDF with the question, the measured topic and every language", async () => {
     const question = "Чи зростає інтерес до астрономії в україномовній Wikipedia і наскільки цьому можна довіряти?";
     const runDir = analyze("uk", question);
 
-    const result = runCli("report", ["--run-dir", runDir], ASTRONOMY);
+    const result = runReport(runDir, ASTRONOMY);
     assert.equal(result.status, 0, result.stderr);
     const out = JSON.parse(result.stdout);
     assert.equal(out.status, "ok");
@@ -72,7 +59,7 @@ describe("report", () => {
 
   it("shows trend metrics and trend reliability per language, with the heuristic_v1 note under the table", async () => {
     const runDir = analyze("uk", "Чи зростає інтерес до астрономії?");
-    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+    assert.equal(runReport(runDir, ASTRONOMY).status, 0);
 
     const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
     // uk: relative attention, raw views and edition growth, months up of 12, trend and reliability.
@@ -87,7 +74,7 @@ describe("report", () => {
     const question = "Is interest in astronomy growing in Ukrainian Wikipedia?";
     const runDir = analyze("en", question);
 
-    const result = runCli("report", ["--run-dir", runDir], ASTRONOMY);
+    const result = runReport(runDir, ASTRONOMY);
     assert.equal(result.status, 0, result.stderr);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
@@ -121,7 +108,7 @@ describe("report", () => {
       const runDir = tempDir();
       const result = analyzeAstronomy(runDir, c.question, { reportLang: c.reportLang, extraArgs: ["--proxy-reason", c.reason] });
       assert.equal(result.status, 0, result.stderr);
-      assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+      assert.equal(runReport(runDir, ASTRONOMY).status, 0);
 
       const pdf = await readPdf(join(runDir, "report.pdf"));
       assert.equal(pdf.pages, 1);
@@ -135,7 +122,7 @@ describe("report", () => {
 
   it("states no assumption for a direct measured topic", async () => {
     const runDir = analyze("uk", "Чи зростає інтерес до астрономії?");
-    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+    assert.equal(runReport(runDir, ASTRONOMY).status, 0);
 
     const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
     assert.ok(!text.includes(squash("Припущення")), text);
@@ -166,7 +153,7 @@ describe("report", () => {
     it(`shows languages with insufficient data only in the group «${c.heading}», with fixed wording (${c.reportLang})`, async () => {
       const runDir = tempDir();
       assert.equal(analyzeFasting(runDir, c.question, { reportLang: c.reportLang }).status, 0);
-      assert.equal(runCli("report", ["--run-dir", runDir], FASTING).status, 0);
+      assert.equal(runReport(runDir, FASTING).status, 0);
 
       const pdf = await readPdf(join(runDir, "report.pdf"));
       assert.equal(pdf.pages, 1);
@@ -185,7 +172,7 @@ describe("report", () => {
   it("renders only the group, without a table, when no language is assessed", async () => {
     const runDir = tempDir();
     assert.equal(analyzeFasting(runDir, "Compare interest in intermittent fasting in pl and xh", { reportLang: "en", langs: "pl,xh" }).status, 0);
-    assert.equal(runCli("report", ["--run-dir", runDir], FASTING).status, 0);
+    assert.equal(runReport(runDir, FASTING).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
@@ -201,7 +188,7 @@ describe("report", () => {
   it("names the historical titles counted in article views and the redirects checked, per language (uk)", async () => {
     const runDir = tempDir();
     assert.equal(analyzeHistory(runDir, "Q9357655", "uk", "uk").status, 0);
-    assert.equal(runCli("report", ["--run-dir", runDir], ARTICLE_HISTORY).status, 0);
+    assert.equal(runReport(runDir, ARTICLE_HISTORY).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
@@ -212,7 +199,7 @@ describe("report", () => {
 
   it("says when a language has no historical titles, and how many redirects were checked (en)", async () => {
     const runDir = analyze("en", "Is interest in astronomy growing?");
-    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+    assert.equal(runReport(runDir, ASTRONOMY).status, 0);
 
     const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
     assert.ok(text.includes(squash("Article views include its historical titles confirmed by the move log; other redirects are not counted.")), text);
@@ -228,7 +215,7 @@ describe("report", () => {
   it("shows a truncated history check as a limitation and as what lowered trend reliability", async () => {
     const runDir = tempDir();
     assert.equal(analyzeHistory(runDir, "Q49740", "en").status, 0);
-    assert.equal(runCli("report", ["--run-dir", runDir], ARTICLE_HISTORY).status, 0);
+    assert.equal(runReport(runDir, ARTICLE_HISTORY).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
@@ -250,7 +237,7 @@ describe("report", () => {
 
   it("leaves the group out when every language is assessed", async () => {
     const runDir = analyze("en", "Is interest in astronomy growing?");
-    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+    assert.equal(runReport(runDir, ASTRONOMY).status, 0);
 
     const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
     assert.ok(!text.includes(squash("Not assessed")), text);
@@ -267,7 +254,7 @@ describe("report", () => {
 
   it("draws the indexed relative attention chart between the measured topic and the table (uk)", async () => {
     const runDir = analyze("uk", "Чи зростає інтерес до астрономії?");
-    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+    assert.equal(runReport(runDir, ASTRONOMY).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
@@ -279,42 +266,42 @@ describe("report", () => {
     for (const label of ["2024-10", "2025-01", "2026-07", "uk", "cs", "pl"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
   });
 
-  it("keeps a chart of 6 assessed language editions over 120 months, a long question and a proxy on one page", async () => {
+  it("keeps a chart of MAX_LANGUAGES assessed language editions over 120 months, a long question and a proxy on one page", async () => {
     const runDir = tempDir();
     const question =
-      "Which of these six language editions shows the most promising relative attention to astronomy for our next research round, " +
+      "Which of these four language editions shows the most promising relative attention to astronomy for our next research round, " +
       "and how far can we trust the trend over the last ten years?";
     const reason = "No article covers amateur astronomy in every language edition; astronomy as a whole is broader than the topic of the question.";
-    const result = analyzeLongPeriod(runDir, "Q333", "uk,cs,pl,en,de,fr", ["--user-question", question, "--proxy-reason", reason]);
+    const result = analyzeLongPeriod(runDir, "Q333", "uk,cs,en,de", { extraArgs: ["--user-question", question, "--proxy-reason", reason] });
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(runCli("report", ["--run-dir", runDir], LONG_PERIOD).status, 0);
+    assert.equal(runReport(runDir, LONG_PERIOD).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
     const chart = chartText(squash(pdf.text), "en");
     assert.ok(chart.includes(squash("100 = median of 2016-09 - 2017-08")), chart);
-    for (const label of ["2017-01", "2026-01", "uk", "cs", "pl", "en", "de", "fr"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
+    for (const label of ["2017-01", "2026-01", "uk", "cs", "en", "de"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
   });
 
   it("leaves not-assessed language editions off the chart", async () => {
     const runDir = tempDir();
-    const result = analyzeLongPeriod(runDir, "Q1666254", "cs,uk,en,de,fr,pl", ["--user-question", "Where is intermittent fasting gaining attention?"]);
+    const result = analyzeLongPeriod(runDir, "Q1666254", "cs,en,de,pl", { extraArgs: ["--user-question", "Where is intermittent fasting gaining attention?"] });
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(runCli("report", ["--run-dir", runDir], LONG_PERIOD).status, 0);
+    assert.equal(runReport(runDir, LONG_PERIOD).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
     const chart = chartText(squash(pdf.text), "en");
-    for (const lang of ["en", "de", "fr"]) assert.ok(chart.includes(lang), `${lang} in ${chart}`);
-    for (const lang of ["cs", "uk", "pl"]) assert.ok(!chart.includes(lang), `${lang} in ${chart}`);
+    for (const lang of ["en", "de"]) assert.ok(chart.includes(lang), `${lang} in ${chart}`);
+    for (const lang of ["cs", "pl"]) assert.ok(!chart.includes(lang), `${lang} in ${chart}`);
   });
 
   it("refuses a report that does not fit on one page and says what to shorten", () => {
-    const runDir = analyze("en", "Is interest in astronomy growing? ".repeat(60));
+    const runDir = analyze("en", "Is interest in astronomy growing? ".repeat(150));
 
-    const result = runCli("report", ["--run-dir", runDir], ASTRONOMY);
+    const result = runReport(runDir, ASTRONOMY);
     assert.equal(result.status, 1);
-    assert.match(result.stderr, /^Error: the report does not fit on one page\. Shorten --user-question or --proxy-reason/);
+    assert.match(result.stderr, /^Error: the report does not fit on one page\. Shorten --user-question or --proxy-reason and rerun analyze\.ts/);
     assert.ok(!existsSync(join(runDir, "report.pdf")));
   });
 
