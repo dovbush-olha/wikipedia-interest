@@ -30,9 +30,11 @@ export type TrendReliability = (typeof RELIABILITY_LEVELS)[number];
 /** Reason codes that lower trend reliability, shared with the report that explains them. */
 export const LOW_VOLUME = "low_volume";
 export const HISTORY_CHECK_TRUNCATED = "history_check_truncated";
-const RECENT_SPIKE = "recent_spike:";
-/** Flag codes for a spike month and for raw views and relative attention moving in opposite directions. */
-const SPIKE = "spike:";
+/** Prefix of a reason code: a spike month in the last 12 months, `recent_spike:YYYY-MM`. */
+export const RECENT_SPIKE = "recent_spike:";
+/** Prefix of a flag code: a spike month of the period, `spike:YYYY-MM`. */
+export const SPIKE = "spike:";
+/** Flag code: raw views and relative attention moving in opposite directions. */
 export const RAW_RELATIVE_DIVERGE = "raw_relative_diverge";
 
 /** The spike month of a `recent_spike:YYYY-MM` reason, else null. */

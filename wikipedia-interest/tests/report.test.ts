@@ -3,8 +3,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { MAX_LANGUAGES, type Analysis } from "../scripts/lib/analysis.ts";
-import { RATIONALE_MAX_CHARACTERS, SUMMARY_MAX_CHARACTERS } from "../scripts/lib/conclusion.ts";
-import { HISTORY_CHECK_TRUNCATED, LOW_VOLUME } from "../scripts/lib/metrics.ts";
+import { RATIONALE_MAX_CHARACTERS, SUMMARY_MAX_CHARACTERS, type Conclusion } from "../scripts/lib/conclusion.ts";
+import { HISTORY_CHECK_TRUNCATED, LOW_VOLUME, RAW_RELATIVE_DIVERGE, RECENT_SPIKE, SPIKE } from "../scripts/lib/metrics.ts";
 import { monthsOf } from "../scripts/lib/period.ts";
 import { STRINGS, type Strings } from "../scripts/lib/strings.ts";
 import {
@@ -389,12 +389,12 @@ describe("report", () => {
   const divergenceCases = [
     {
       reportLang: "en",
-      fewer: "uk, pl: fewer raw views, but the topic takes a larger share of attention inside Wikipedia; this does not mean that interest grew.",
+      fewer: "uk, pl: fewer raw views, but the topic takes a larger share of attention inside Wikipedia; this does not mean that more people read about it.",
       more: "cs: more raw views, but the language edition as a whole grew faster, so the topic's share of attention fell.",
     },
     {
       reportLang: "uk",
-      fewer: "uk, pl: сирих переглядів стало менше, але тема займає більшу частку уваги всередині Wikipedia; це не означає, що інтерес зріс.",
+      fewer: "uk, pl: сирих переглядів стало менше, але тема займає більшу частку уваги всередині Wikipedia; це не означає, що про тему читає більше людей.",
       more: "cs: сирих переглядів більше, але мовний розділ загалом зростав швидше, тож частка уваги до теми зменшилась.",
     },
   ] as const;
@@ -409,7 +409,7 @@ describe("report", () => {
           language.trend = up ? "up" : "down";
           language.relative_attention_growth_pct = up ? 24.5 : -24.5;
           language.raw_growth_pct = up ? -12.5 : 12.5;
-          language.flags.push("raw_relative_diverge");
+          language.flags.push(RAW_RELATIVE_DIVERGE);
         }
       });
       assert.equal(runReport(runDir, ASTRONOMY).status, 0);
@@ -420,8 +420,18 @@ describe("report", () => {
   }
 
   const glyphCases = [
-    { reportLang: "uk", stand: "астрономія (Q333, uk)*", note: "*: локальну назву статті не показано через обмеження PDF-шрифту." },
-    { reportLang: "en", stand: "astronomy (Q333, uk)*", note: "*: the local article title is not shown because of a PDF font limitation." },
+    {
+      reportLang: "uk",
+      stand: "астрономія (Q333, uk)*",
+      note: "*: локальну назву статті не показано через обмеження PDF-шрифту.",
+      historical: "Історичні назви: uk «Астрономія (наука)» та ще 1*.",
+    },
+    {
+      reportLang: "en",
+      stand: "astronomy (Q333, uk)*",
+      note: "*: the local article title is not shown because of a PDF font limitation.",
+      historical: "Historical titles: uk “Астрономія (наука)” and 1 more*.",
+    },
   ] as const;
   for (const c of glyphCases) {
     it(`replaces an article title the font cannot draw with the language code, the QID and the label, and keeps its metrics (${c.reportLang})`, async () => {
@@ -443,8 +453,8 @@ describe("report", () => {
       for (const fact of [c.reportLang === "uk" ? "7,91" : "7.91", "-47", "-63"]) assert.ok(table.includes(fact), fact);
       const block = limitationsText(text, c.reportLang);
       assert.ok(block.includes(squash(c.note)), block);
-      // A historical title the font cannot draw is replaced as well; a drawable one stays.
-      assert.ok(block.includes(squash("«Астрономія (наука)»")) || block.includes(squash("“Астрономія (наука)”")), block);
+      // A historical title the font cannot draw is counted and marked for the note; a drawable one stays.
+      assert.ok(block.includes(squash(c.historical)), block);
     });
   }
 
@@ -473,10 +483,10 @@ describe("report", () => {
       growthNote: (t) => [t.growthNote(compares)],
       historyNote: (t) => [
         t.historyNote([
-          { lang: "uk", titles: ["X", "X"], more: 2, checked: 50, truncated: true },
-          { lang: "cs", titles: ["X"], more: 0, checked: 1, truncated: false },
-          { lang: "cs", titles: [], more: 1, checked: 1, truncated: false },
-          { lang: "pl", titles: [], more: 0, checked: 3, truncated: false },
+          { lang: "uk", titles: ["X", "X"], more: 2, undrawable: true, checked: 50, truncated: true },
+          { lang: "cs", titles: ["X"], more: 0, undrawable: false, checked: 1, truncated: false },
+          { lang: "cs", titles: [], more: 1, undrawable: true, checked: 1, truncated: false },
+          { lang: "pl", titles: [], more: 0, undrawable: false, checked: 3, truncated: false },
         ]),
       ],
       shortHistory: (t) => [t.shortHistory("X", 0, 24), t.shortHistory("X", 17, 24)],
@@ -512,18 +522,28 @@ describe("report", () => {
 });
 
 // Seam B, the worst case of the page: MAX_LANGUAGES language editions over 120 months, a long question with a proxy reason,
-// the longest summary and rationales in the widest action label, and every limitation the data can add, in both report languages:
-// with every language assessed, the longest table; with one not assessed, the not-assessed group too.
+// the longest summary and rationales in the widest action label, long titles and every limitation the data can add,
+// in both report languages: with every language assessed, the longest table; with one not assessed, the not-assessed group too,
+// for no linked article and for a short history, whose text names the article.
 describe("report worst-case layout", () => {
   const worstCases = [
-    { qid: "Q333", langs: "uk,cs,en", reportLang: "en" },
-    { qid: "Q333", langs: "uk,cs,en", reportLang: "uk" },
-    { qid: "Q1666254", langs: "en,de,pl", reportLang: "en" },
-    { qid: "Q1666254", langs: "en,de,pl", reportLang: "uk" },
+    { qid: "Q333", langs: "uk,cs,en", reportLang: "en", shortHistory: false },
+    { qid: "Q333", langs: "uk,cs,en", reportLang: "uk", shortHistory: false },
+    { qid: "Q1666254", langs: "en,de,pl", reportLang: "en", shortHistory: false },
+    { qid: "Q1666254", langs: "en,de,pl", reportLang: "uk", shortHistory: false },
+    { qid: "Q1666254", langs: "en,de,pl", reportLang: "en", shortHistory: true },
+    { qid: "Q1666254", langs: "en,de,pl", reportLang: "uk", shortHistory: true },
   ] as const;
+  type WorstCase = (typeof worstCases)[number];
 
-  /** Every limitation at once for every assessed language: both divergences, low volume, a recent spike each month, a truncated history. */
-  function worsen(analysis: Analysis): void {
+  const longHistory = (title: string) =>
+    Array.from({ length: 6 }, (_, n) => `${title} (${["history", "overview", "research", "practice", "theory", "terms"][n]} and related subtopics)`);
+
+  /**
+   * Every limitation at once for every assessed language: both divergences, low volume, a recent spike each month,
+   * a truncated history with long historical titles; a long title, and a title the font cannot draw.
+   */
+  function worsen(analysis: Analysis, shortHistory: boolean): void {
     const months = monthsOf(analysis.period);
     const recent = months.slice(-12);
     analysis.languages.forEach((language, i) => {
@@ -534,40 +554,72 @@ describe("report worst-case layout", () => {
       language.raw_growth_pct = up ? -99.9 : 1234.5;
       language.edition_growth_pct = -99.9;
       language.trend_reliability = "moderate";
-      language.reliability_reasons = ["direction_matches_in_12_of_12_recent_months", LOW_VOLUME, ...recent.map((month) => `recent_spike:${month}`), HISTORY_CHECK_TRUNCATED];
-      language.flags = [...months.filter((_, m) => m % 2 === 1).map((month) => `spike:${month}`), LOW_VOLUME, "raw_relative_diverge", HISTORY_CHECK_TRUNCATED];
-      language.historical_titles = Array.from({ length: 6 }, (_, n) => `${language.title} (${["history", "overview", "research", "practice", "theory", "terms"][n]} and related subtopics)`);
+      language.reliability_reasons = [
+        "direction_matches_in_12_of_12_recent_months",
+        LOW_VOLUME,
+        ...recent.map((month) => `${RECENT_SPIKE}${month}`),
+        HISTORY_CHECK_TRUNCATED,
+      ];
+      language.flags = [...months.filter((_, m) => m % 2 === 1).map((month) => `${SPIKE}${month}`), LOW_VOLUME, RAW_RELATIVE_DIVERGE, HISTORY_CHECK_TRUNCATED];
+      language.historical_titles = longHistory(language.title);
       language.redirect_candidates_checked = 50;
     });
+    const first = analysis.languages[0];
+    first.title = `${first.title} (history and practice)`;
     // A title in a script the font cannot draw, replaced by the longer language code, QID and label.
     analysis.languages[1].title = "天文学と断食の総合的な研究";
+    if (shortHistory) {
+      const title = "Post przerywany: historia, badania i codzienna praktyka";
+      analysis.languages[2] = {
+        lang: "pl",
+        title,
+        historical_titles: longHistory(title),
+        redirect_candidates_checked: 50,
+        data_status: "insufficient_data",
+        reason: "short_history",
+        max_months_available: 119,
+        trend: null,
+        trend_reliability: null,
+        flags: [HISTORY_CHECK_TRUNCATED],
+      };
+    }
+  }
+
+  /** The worst case's run folder, its analysis edited by `edit` after the worst limitations, and its longest conclusion. */
+  function worstCaseRun(c: WorstCase, edit: (analysis: Analysis) => void = () => {}): { runDir: string; conclusion: Conclusion } {
+    const runDir = tempDir();
+    const uk = c.reportLang === "uk";
+    const question = uk
+      ? "Які з цих трьох мовних розділів показують найперспективнішу відносну увагу до теми для нашого наступного раунду досліджень, і наскільки можна довіряти тренду за останні десять років?"
+      : "Which of these three language editions shows the most promising relative attention to the topic for our next research round, and how far can we trust the trend over the last ten years?";
+    const reason = uk
+      ? "Статті саме про тему питання немає в усіх мовних розділах; виміряна тема ширша за тему питання і охоплює суміжні підтеми."
+      : "No article covers the exact topic of the question in every language edition; the measured topic is broader and covers related subtopics.";
+    const result = analyzeLongPeriod(runDir, c.qid, c.langs, { reportLang: c.reportLang, extraArgs: ["--user-question", question, "--proxy-reason", reason] });
+    assert.equal(result.status, 0, result.stderr);
+    editAnalysis(runDir, (analysis) => {
+      worsen(analysis, c.shortHistory);
+      edit(analysis);
+    });
+
+    const words = uk
+      ? "Відносна увага стабільно зростає у більшості місяців, дані надійні, розбіжностей немає; "
+      : "Relative attention grows steadily in most months, the data is reliable, with no divergence; ";
+    const fill = (length: number) => words.repeat(Math.ceil(length / words.length)).slice(0, length).trimEnd().padEnd(length, "ш");
+    const conclusion = validConclusion(runDir);
+    conclusion.summary = fill(SUMMARY_MAX_CHARACTERS);
+    for (const language of conclusion.languages) {
+      language.action = "investigate_next";
+      language.rationale = fill(RATIONALE_MAX_CHARACTERS);
+    }
+    return { runDir, conclusion };
   }
 
   for (const c of worstCases) {
-    it(`fits MAX_LANGUAGES language editions and the longest texts on one page (${c.qid} ${c.langs}, ${c.reportLang})`, async () => {
+    const variant = c.shortHistory ? ", a short history" : "";
+    it(`fits MAX_LANGUAGES language editions and the longest texts on one page (${c.qid} ${c.langs}${variant}, ${c.reportLang})`, async () => {
       assert.equal(c.langs.split(",").length, MAX_LANGUAGES);
-      const runDir = tempDir();
-      const uk = c.reportLang === "uk";
-      const question = uk
-        ? "Які з цих трьох мовних розділів показують найперспективнішу відносну увагу до теми для нашого наступного раунду досліджень, і наскільки можна довіряти тренду за останні десять років?"
-        : "Which of these three language editions shows the most promising relative attention to the topic for our next research round, and how far can we trust the trend over the last ten years?";
-      const reason = uk
-        ? "Статті саме про тему питання немає в усіх мовних розділах; виміряна тема ширша за тему питання і охоплює суміжні підтеми."
-        : "No article covers the exact topic of the question in every language edition; the measured topic is broader and covers related subtopics.";
-      const result = analyzeLongPeriod(runDir, c.qid, c.langs, { reportLang: c.reportLang, extraArgs: ["--user-question", question, "--proxy-reason", reason] });
-      assert.equal(result.status, 0, result.stderr);
-      editAnalysis(runDir, worsen);
-
-      const words = uk
-        ? "Відносна увага стабільно зростає у більшості місяців, дані надійні, розбіжностей немає; "
-        : "Relative attention grows steadily in most months, the data is reliable, with no divergence; ";
-      const fill = (length: number) => words.repeat(Math.ceil(length / words.length)).slice(0, length).trimEnd().padEnd(length, "ш");
-      const conclusion = validConclusion(runDir);
-      conclusion.summary = fill(SUMMARY_MAX_CHARACTERS);
-      for (const language of conclusion.languages) {
-        language.action = "investigate_next";
-        language.rationale = fill(RATIONALE_MAX_CHARACTERS);
-      }
+      const { runDir, conclusion } = worstCaseRun(c);
       const report = runReport(runDir, LONG_PERIOD, conclusion);
       assert.equal(report.status, 0, report.stderr);
 
@@ -579,6 +631,19 @@ describe("report worst-case layout", () => {
       for (const part of [conclusion.summary, t.chartTitle, t.heuristicNote, t.limitationsHeading, t.titleNotShownNote, t.source]) {
         assert.ok(text.includes(squash(part)), `${part} in ${pdf.text}`);
       }
+    });
+  }
+
+  // The other side of the calibration: one language edition more does not fit, even in the roomiest of the worst cases.
+  for (const c of worstCases.filter((c) => c.qid === "Q333")) {
+    it(`does not fit MAX_LANGUAGES + 1 language editions on one page (${c.reportLang})`, () => {
+      const { runDir, conclusion } = worstCaseRun(c, (analysis) => {
+        analysis.languages.push({ ...structuredClone(analysis.languages[0]), lang: "de" });
+      });
+      assert.equal(conclusion.languages.length, MAX_LANGUAGES + 1);
+      const report = runReport(runDir, LONG_PERIOD, conclusion);
+      assert.equal(report.status, 1, report.stdout);
+      assert.match(report.stderr, /^Error: the report does not fit on one page\./);
     });
   }
 });

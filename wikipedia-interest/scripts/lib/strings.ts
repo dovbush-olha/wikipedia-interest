@@ -17,16 +17,45 @@ import type { MonthRange } from "./period.ts";
 
 const range = ({ start, end }: MonthRange) => `${start} - ${end}`;
 
-/** The history check of one article: the historical titles shown and `more` not shown, among the redirect candidates checked. */
-export type HistoryCheckLine = { lang: string; titles: string[]; more: number; checked: number; truncated: boolean };
+/**
+ * The history check of one article: the historical titles shown and how many `more` are not, `undrawable` when some of those
+ * are not shown because the PDF font cannot draw them, among the redirect candidates checked.
+ */
+export type HistoryCheckLine = { lang: string; titles: string[]; more: number; undrawable: boolean; checked: number; truncated: boolean };
 
-/** The historical titles shown, in `quotes`, then how many more; `none` counts titles of which none can be shown. */
-const historicalTitles = (titles: string[], more: number, quotes: string, andMore: (count: number) => string, none: (count: number) => string) =>
-  titles.length === 0
-    ? none(more)
-    : titles.map((title) => `${quotes[0]}${title}${quotes[1]}`).join(", ") + (more > 0 ? ` ${andMore(more)}` : "");
+/** The words of the history check in one report language. */
+type HistoryWords = {
+  intro: string;
+  noneFound: string;
+  found: (entries: string) => string;
+  quote: (title: string) => string;
+  andMore: (count: number) => string;
+  /** No title shown: all of them are ones the font cannot draw. */
+  notShown: (count: number) => string;
+  checked: (entries: string) => string;
+  truncated: (langs: string, checked: number) => string;
+};
 
-const langList = (lines: { lang: string }[]) => lines.map(({ lang }) => lang).join(", ");
+/** The history check of every article, grouped by outcome; `*` marks titles not shown because of the font. */
+const historyNote = (words: HistoryWords) => (lines: HistoryCheckLine[]) => {
+  const found = lines
+    .filter(({ titles, more }) => titles.length + more > 0)
+    .map(({ lang, titles, more, undrawable }) => {
+      const shown = titles.length === 0 ? words.notShown(more) : titles.map(words.quote).join(", ") + (more > 0 ? ` ${words.andMore(more)}` : "");
+      return `${lang} ${shown}${undrawable ? "*" : ""}`;
+    });
+  // A truncated check stops at the candidate limit: grouped by how many were checked, so no group borrows another's count.
+  const truncated = Map.groupBy(
+    lines.filter((line) => line.truncated),
+    (line) => line.checked,
+  );
+  return [
+    words.intro,
+    found.length === 0 ? words.noneFound : words.found(found.join("; ")),
+    words.checked(lines.map(({ lang, checked }) => `${lang} ${checked}`).join(", ")),
+    ...[...truncated].map(([checked, group]) => words.truncated(group.map(({ lang }) => lang).join(", "), checked)),
+  ].join(" ");
+};
 
 /** Spike months of one language edition: the month, or how many and between which months. */
 const spikeSpan = (months: string[], many: (count: number, span: string) => string) =>
@@ -73,20 +102,16 @@ const en = {
     `one level lower for low volume (raw views median of the last 12 months below ${LOW_VOLUME_MEDIAN_VIEWS}), ` +
     "for spikes in the last 12 months and for a truncated history check. " +
     `A flat trend (within ±${FLAT_GROWTH_PCT}%) has no reliability.`,
-  historyNote: (lines: HistoryCheckLine[]) => {
-    const found = lines.filter(({ titles, more }) => titles.length + more > 0);
-    const truncated = lines.filter((line) => line.truncated);
-    return [
-      "Article views include its historical titles confirmed by the move log; other redirects are not counted.",
-      found.length === 0
-        ? "No historical titles found."
-        : `Historical titles: ${found.map(({ lang, titles, more }) => `${lang} ${historicalTitles(titles, more, "“”", (count) => `and ${count} more`, (count) => `${count} not shown*`)}`).join("; ")}.`,
-      `Redirect candidates checked: ${lines.map(({ lang, checked }) => `${lang} ${checked}`).join(", ")}.`,
-      ...(truncated.length === 0
-        ? []
-        : [`${langList(truncated)}: only the first ${truncated[0].checked} redirect candidates checked, so historical titles may be missing.`]),
-    ].join(" ");
-  },
+  historyNote: historyNote({
+    intro: "Article views include its historical titles confirmed by the move log; other redirects are not counted.",
+    noneFound: "No historical titles found.",
+    found: (entries) => `Historical titles: ${entries}.`,
+    quote: (title) => `“${title}”`,
+    andMore: (count) => `and ${count} more`,
+    notShown: (count) => `${count} not shown`,
+    checked: (entries) => `Redirect candidates checked: ${entries}.`,
+    truncated: (langs, checked) => `${langs}: only the first ${checked} redirect candidates checked, so historical titles may be missing.`,
+  }),
   viewsPerMillionNote:
     "Views per million: median monthly views of the article per million human views of its language edition over the last 12 months.",
   notAssessedHeading: "Not assessed",
@@ -114,7 +139,7 @@ const en = {
   proxyLimitation: (label: string) =>
     `The measured topic is a proxy: the report measures attention to “${label}”, which may be broader or narrower than the topic of the question.`,
   fewerRawViews: (langs: string[]) =>
-    `${langs.join(", ")}: fewer raw views, but the topic takes a larger share of attention inside Wikipedia; this does not mean that interest grew.`,
+    `${langs.join(", ")}: fewer raw views, but the topic takes a larger share of attention inside Wikipedia; this does not mean that more people read about it.`,
   moreRawViews: (langs: string[]) =>
     `${langs.join(", ")}: more raw views, but the language edition as a whole grew faster, so the topic's share of attention fell.`,
   spikesIntro: `Spikes, months with raw views above ${SPIKE_MEDIAN_MULTIPLE}× the period's median, may reflect one-off events rather than lasting attention:`,
@@ -165,20 +190,17 @@ const uk: Strings = {
     `на рівень нижче за малий обсяг (медіана сирих переглядів за останні 12 місяців менше ${LOW_VOLUME_MEDIAN_VIEWS}), ` +
     "за сплески в останніх 12 місяцях і за обрізану перевірку історії. " +
     `Для тренду «без змін» (у межах ±${FLAT_GROWTH_PCT}%) надійності немає.`,
-  historyNote: (lines) => {
-    const found = lines.filter(({ titles, more }) => titles.length + more > 0);
-    const truncated = lines.filter((line) => line.truncated);
-    return [
-      "Перегляди статті включають її історичні назви, підтверджені журналом перейменувань; інші редиректи не враховано.",
-      found.length === 0
-        ? "Історичних назв не знайдено."
-        : `Історичні назви: ${found.map(({ lang, titles, more }) => `${lang} ${historicalTitles(titles, more, "«»", (count) => `та ще ${count}`, (count) => `${count} не показано*`)}`).join("; ")}.`,
-      `Перевірено кандидатів на історичну назву: ${lines.map(({ lang, checked }) => `${lang} ${checked}`).join(", ")}.`,
-      ...(truncated.length === 0
-        ? []
-        : [`${langList(truncated)}: перевірено лише перших ${truncated[0].checked} кандидатів, тож історичні назви могли бути пропущені.`]),
-    ].join(" ");
-  },
+  historyNote: historyNote({
+    intro: "Перегляди статті включають її історичні назви, підтверджені журналом перейменувань; інші редиректи не враховано.",
+    noneFound: "Історичних назв не знайдено.",
+    found: (entries) => `Історичні назви: ${entries}.`,
+    quote: (title) => `«${title}»`,
+    andMore: (count) => `та ще ${count}`,
+    notShown: (count) => `${count} не показано`,
+    checked: (entries) => `Перевірено кандидатів на історичну назву: ${entries}.`,
+    truncated: (langs, checked) =>
+      `${langs}: перевірено лише перших ${checked} кандидатів на історичну назву, тож історичні назви могли бути пропущені.`,
+  }),
   viewsPerMillionNote:
     "Переглядів на мільйон: медіана місячних переглядів статті на мільйон переглядів людьми її мовного розділу за останні 12 місяців.",
   notAssessedHeading: "Не оцінено",
@@ -206,7 +228,7 @@ const uk: Strings = {
   proxyLimitation: (label) =>
     `Виміряна тема - проксі: звіт вимірює увагу до теми «${label}», яка може бути ширшою або вужчою за тему питання.`,
   fewerRawViews: (langs) =>
-    `${langs.join(", ")}: сирих переглядів стало менше, але тема займає більшу частку уваги всередині Wikipedia; це не означає, що інтерес зріс.`,
+    `${langs.join(", ")}: сирих переглядів стало менше, але тема займає більшу частку уваги всередині Wikipedia; це не означає, що про тему читає більше людей.`,
   moreRawViews: (langs) =>
     `${langs.join(", ")}: сирих переглядів більше, але мовний розділ загалом зростав швидше, тож частка уваги до теми зменшилась.`,
   spikesIntro: `Сплески - місяці, у яких сирих переглядів понад ${SPIKE_MEDIAN_MULTIPLE}× медіани періоду, - можуть бути разовими подіями, а не стійкою увагою:`,

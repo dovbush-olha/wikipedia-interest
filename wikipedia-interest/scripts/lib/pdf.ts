@@ -82,7 +82,7 @@ export async function renderReport(analysis: Analysis, conclusion: Conclusion, g
     const labels = { title: t.chartTitle, baseline: t.chartBaseline(analysis.growth_compares) };
     const tick = new Intl.NumberFormat(analysis.report_lang, { maximumFractionDigits: 0 });
     const ink = { text: INK, muted: MUTED, rule: RULE };
-    const top = doc.y + doc.currentLineHeight();
+    const top = doc.y + doc.currentLineHeight() / 2;
     drawChart(doc, monthsOf(period), series, labels, ink, (value) => tick.format(value), { left: MARGIN, top, width });
     doc.fontSize(BODY_SIZE).moveDown(0.5);
     drawLanguageTable(doc, assessed, conclusion.languages, analysis, languageName, articleName, t, width);
@@ -166,11 +166,13 @@ function interpretationTint(doc: PDFKit.PDFDocument, x: number, y: number, width
   doc.rect(x, y, INTERPRETATION_EDGE_WIDTH, height).fill(INTERPRETATION_EDGE);
 }
 
+type ArticleNamer = (lang: string, title: string) => string;
+
 /**
  * The title of a language edition's article as the page shows it: as is when the font can draw it, otherwise
  * the measured topic's label with its QID and the language code, marked for the note under the limitations.
  */
-function articleNamer(analysis: Analysis, t: Strings): (lang: string, title: string) => string {
+function articleNamer(analysis: Analysis, t: Strings): ArticleNamer {
   const { label, qid } = analysis.measured_topic;
   return (lang, title) => (drawable(title) ? title : t.titleNotShown(label, qid, lang));
 }
@@ -189,10 +191,10 @@ function limitations(analysis: Analysis, assessed: AssessedLanguage[], t: String
 
   const diverging = assessed.filter((language) => language.flags.includes(RAW_RELATIVE_DIVERGE));
   // A diverging trend is never flat: up is more relative attention on fewer raw views, down the other way round.
-  const fewer = diverging.filter((language) => language.trend === "up").map((language) => language.lang);
-  const more = diverging.filter((language) => language.trend === "down").map((language) => language.lang);
-  if (fewer.length > 0) items.push(t.fewerRawViews(fewer));
-  if (more.length > 0) items.push(t.moreRawViews(more));
+  const fewerRawViews = diverging.filter((language) => language.trend === "up").map((language) => language.lang);
+  const moreRawViews = diverging.filter((language) => language.trend === "down").map((language) => language.lang);
+  if (fewerRawViews.length > 0) items.push(t.fewerRawViews(fewerRawViews));
+  if (moreRawViews.length > 0) items.push(t.moreRawViews(moreRawViews));
 
   const spikes = assessed.flatMap((language) => {
     const months = language.flags.flatMap((flag) => spikeMonth(flag) ?? []);
@@ -211,6 +213,7 @@ function limitations(analysis: Analysis, assessed: AssessedLanguage[], t: String
             lang: language.lang,
             titles: shown,
             more: language.historical_titles.length - shown.length,
+            undrawable: !language.historical_titles.every(drawable),
             checked: language.redirect_candidates_checked,
             truncated: language.flags.includes(HISTORY_CHECK_TRUNCATED),
           };
@@ -248,7 +251,7 @@ function drawLanguageTable(
   interpretations: LanguageConclusion[],
   analysis: Analysis,
   languageName: (lang: string) => string,
-  articleName: (lang: string, title: string) => string,
+  articleName: ArticleNamer,
   t: Strings,
   width: number,
 ): void {
@@ -280,16 +283,16 @@ function drawLanguageTable(
   // the article column takes the rest.
   const gap = 6;
   // More room where a left-aligned column follows a right-aligned one, whose text runs up to the column's edge.
-  const turn = 4;
+  const alignmentTurnGap = 4;
   const padding = 3;
 
-  const row = (cells: string[], color: string) => {
+  const row = (cells: string[], color: string, lineGap = 0) => {
     const top = doc.y;
     let x = MARGIN;
     let height = 0;
     cells.forEach((cell, i) => {
-      const indent = i > 0 && columns[i - 1].align === "right" && columns[i].align === "left" ? turn : 0;
-      const options = { width: columns[i].share * width - gap - indent, align: columns[i].align };
+      const indent = i > 0 && columns[i - 1].align === "right" && columns[i].align === "left" ? alignmentTurnGap : 0;
+      const options = { width: columns[i].share * width - gap - indent, align: columns[i].align, lineGap };
       doc.fillColor(color).text(cell, x + indent, top, options);
       height = Math.max(height, doc.heightOfString(cell, options));
       x += columns[i].share * width;
@@ -305,7 +308,7 @@ function drawLanguageTable(
   // so the language name stays the row's only label.
   const interpretationLeft = MARGIN + LANGUAGE_SHARE * width;
   // What lowered trend reliability, under the language's facts across the width: a narrow column would stack its reasons.
-  const lowered = (language: AssessedLanguage) => {
+  const reliabilityLowered = (language: AssessedLanguage) => {
     const reasons = reliabilityDowngrades(language, t);
     if (reasons.length === 0) return;
     const options = { width: MARGIN + width - interpretationLeft };
@@ -326,13 +329,14 @@ function drawLanguageTable(
   };
 
   doc.fontSize(SMALL_SIZE);
-  row(columns.map((column) => column.header), MUTED);
+  // Headers of several words run to three lines.
+  row(columns.map((column) => column.header), MUTED, DENSE_LINE_GAP);
   rule();
   doc.fontSize(BODY_SIZE);
   // readConclusion orders the interpretations as the assessed languages.
   languages.forEach((language, i) => {
     row(columns.map((column) => column.cell(language)), INK);
-    lowered(language);
+    reliabilityLowered(language);
     interpretation(interpretations[i]);
     rule();
   });
@@ -344,7 +348,7 @@ function drawNotAssessed(
   languages: NotAssessedLanguage[],
   analysis: Analysis,
   languageName: (lang: string) => string,
-  articleName: (lang: string, title: string) => string,
+  articleName: ArticleNamer,
   t: Strings,
   width: number,
 ): void {
@@ -369,7 +373,7 @@ function drawNotAssessed(
 function notAssessedText(
   language: NotAssessedLanguage,
   analysis: Analysis,
-  articleName: (lang: string, title: string) => string,
+  articleName: ArticleNamer,
   t: Strings,
 ): string {
   switch (language.reason) {
