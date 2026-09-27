@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { STRINGS } from "../scripts/lib/strings.ts";
-import { analyzeAstronomy, ASTRONOMY, runCli, tempDir } from "./helpers.ts";
+import { analyzeAstronomy, analyzeFasting, ASTRONOMY, FASTING, runCli, tempDir } from "./helpers.ts";
 
 // Seam B: the report CLI, fed by a real analyze run on recorded fixtures.
 function analyze(reportLang: "uk" | "en", question: string): string {
@@ -22,6 +22,13 @@ async function readPdf(file: string): Promise<{ pages: number; text: string }> {
     text += content.items.map((item) => ("str" in item ? item.str : "")).join("");
   }
   return { pages: pdf.numPages, text };
+}
+
+/** The page text before and after the heading of the not-assessed group, which follows the table. */
+function splitAtNotAssessed(text: string, heading: string): { table: string; notAssessed: string } {
+  const at = text.indexOf(squash(heading));
+  assert.ok(at !== -1, `no "${heading}" in ${text}`);
+  return { table: text.slice(0, at), notAssessed: text.slice(at) };
 }
 
 // Line wrapping and text runs split words unpredictably, so compare text without whitespace.
@@ -82,6 +89,74 @@ describe("report", () => {
     assert.ok(text.includes(squash("Generated 2026-09-15")), pdf.text);
     for (const fact of ["-47.2%", "2 of 12", "down", "high", "moderate: spike 2025-11"]) assert.ok(text.includes(squash(fact)), fact);
     assert.ok(text.includes(squash("heuristic_v1 is a simple product heuristic, not a statistical confidence or probability")), pdf.text);
+  });
+
+  const notAssessedCases = [
+    {
+      reportLang: "uk",
+      question: "Порівняй інтерес до інтервального голодування в pl і cs",
+      heading: "Не оцінено",
+      pl: "pl - польська",
+      eu: "eu - баскська",
+      phrases: ["Тема може бути описана в іншій статті або розділі", "Це не означає ні низької, ні високої уваги"],
+      shortHistory: "є лише за останні 9 з 24 міс. запитаного періоду",
+    },
+    {
+      reportLang: "en",
+      question: "Compare interest in intermittent fasting in pl and cs",
+      heading: "Not assessed",
+      pl: "pl - Polish",
+      eu: "eu - Basque",
+      phrases: ["The topic may be covered in another article or section", "This means neither low nor high attention"],
+      shortHistory: "only for the last 9 of the 24 requested months",
+    },
+  ] as const;
+  for (const c of notAssessedCases) {
+    it(`shows languages with insufficient data only in the group «${c.heading}», with fixed wording (${c.reportLang})`, async () => {
+      const runDir = tempDir();
+      assert.equal(analyzeFasting(runDir, c.question, { reportLang: c.reportLang }).status, 0);
+      assert.equal(runCli("report", ["--run-dir", runDir], FASTING).status, 0);
+
+      const pdf = await readPdf(join(runDir, "report.pdf"));
+      assert.equal(pdf.pages, 1);
+      const t = STRINGS[c.reportLang];
+      const { table, notAssessed } = splitAtNotAssessed(squash(pdf.text), c.heading);
+      assert.ok(notAssessed.includes(squash(t.notAssessedNote)), notAssessed);
+      assert.ok(notAssessed.includes(squash(`${c.pl}${t.noLinkedArticle}`)), notAssessed);
+      assert.ok(notAssessed.includes(squash(`${c.eu}${t.shortHistory("Aldizkako barau", 9, 24)}`)), notAssessed);
+      for (const phrase of [...c.phrases, c.shortHistory]) assert.ok(notAssessed.includes(squash(phrase)), phrase);
+      // The assessed languages stay in the table, the others only in their group.
+      for (const title of ["Přerušovaný půst", "Інтервальне голодування"]) assert.ok(table.includes(squash(title)), table);
+      for (const shown of [c.pl, c.eu, "Aldizkako barau"]) assert.ok(!table.includes(squash(shown)), shown);
+    });
+  }
+
+  it("renders only the group, without a table, when no language is assessed", async () => {
+    const runDir = tempDir();
+    assert.equal(analyzeFasting(runDir, "Compare interest in intermittent fasting in pl and eu", { reportLang: "en", langs: "pl,eu" }).status, 0);
+    assert.equal(runCli("report", ["--run-dir", runDir], FASTING).status, 0);
+
+    const pdf = await readPdf(join(runDir, "report.pdf"));
+    assert.equal(pdf.pages, 1);
+    const { table, notAssessed } = splitAtNotAssessed(squash(pdf.text), "Not assessed");
+    assert.ok(notAssessed.includes(squash("pl - Polish")) && notAssessed.includes(squash("eu - Basque")), notAssessed);
+    assert.ok(!table.includes(squash(STRINGS.en.columnViewsPerMillion)), table);
+  });
+
+  it("has fixed wording for every reason of insufficient data in both report languages", () => {
+    const compares = { first_12_months: { start: "2024-09", end: "2025-08" }, last_12_months: { start: "2025-09", end: "2026-08" } };
+    assert.ok(STRINGS.uk.shortHistory("Стаття", 0, 24).includes("немає даних про перегляди"));
+    assert.ok(STRINGS.en.shortHistory("Article", 0, 24).includes("has no views data"));
+    assert.ok(STRINGS.uk.zeroBaseline(compares).includes("2024-09 - 2025-08"));
+    assert.ok(STRINGS.en.zeroBaseline(compares).includes("2024-09 - 2025-08"));
+  });
+
+  it("leaves the group out when every language is assessed", async () => {
+    const runDir = analyze("en", "Is interest in astronomy growing?");
+    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+
+    const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
+    assert.ok(!text.includes(squash("Not assessed")), text);
   });
 
   it("keeps the Ukrainian and English dictionaries on the same set of keys", () => {

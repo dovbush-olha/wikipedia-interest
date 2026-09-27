@@ -52,3 +52,20 @@ export function analyzeAstronomy(
     env,
   );
 }
+
+// Q1666254 (intermittent fasting) in cs, pl, eu and uk, recorded on 2026-09-27 for the period 2024-09..2026-08,
+// the default period of a fixed "today" of 2026-09-15: pl has no article linked in Wikidata, and the eu article has views only from 2025-12.
+// Also recorded: pl and eu alone in English, and cs with ua, a language code without a Wikipedia.
+export const FASTING = fixtureEnv("fasting-cs-pl-eu-uk", "2026-09-15");
+
+export function analyzeFasting(
+  outDir: string,
+  question: string,
+  { reportLang = "uk", langs = "cs,pl,eu,uk" }: { reportLang?: "uk" | "en"; langs?: string } = {},
+): CliResult {
+  return runCli(
+    "analyze",
+    ["--qid", "Q1666254", "--langs", langs, "--user-question", question, "--report-lang", reportLang, "--out-dir", outDir],
+    FASTING,
+  );
+}

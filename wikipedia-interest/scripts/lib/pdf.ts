@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import PDFDocument from "pdfkit";
-import type { Analysis, LanguageResult } from "./analysis.ts";
+import type { Analysis, AssessedLanguage, NotAssessedLanguage } from "./analysis.ts";
 import { UserError } from "./cli.ts";
 import { LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
 import { SKILL_DIR } from "./env.ts";
@@ -13,6 +13,8 @@ const MARGIN = 48;
 const INK = "#1a1a1a";
 const MUTED = "#666666";
 const RULE = "#bbbbbb";
+/** Width share of the language column, in the table and in the not-assessed group alike. */
+const LANGUAGE_SHARE = 0.145;
 
 export async function renderReport(analysis: Analysis, generatedOn: string): Promise<Buffer> {
   const t = STRINGS[analysis.report_lang];
@@ -43,11 +45,21 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
   doc.moveDown(0.3);
   labelled(doc, t.measuredTopic, `${topic.label} (${topic.qid})${description}`, width);
 
-  doc.moveDown(1.2);
-  drawLanguageTable(doc, analysis, t, width);
-  doc.moveDown(0.8).fillColor(MUTED).fontSize(8);
-  for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), t.heuristicNote]) {
-    doc.text(note, MARGIN, doc.y, { width }).moveDown(0.4);
+  // Languages with insufficient data are never ranked with the assessed ones: they get a group of their own.
+  const assessed = analysis.languages.filter((language) => language.data_status === "ok");
+  const notAssessed = analysis.languages.filter((language) => language.data_status === "insufficient_data");
+  const languageName = languageNamer(analysis);
+  if (assessed.length > 0) {
+    doc.moveDown(1.2);
+    drawLanguageTable(doc, assessed, analysis, languageName, t, width);
+    doc.moveDown(0.8).fillColor(MUTED).fontSize(8);
+    for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), t.heuristicNote]) {
+      doc.text(note, MARGIN, doc.y, { width }).moveDown(0.4);
+    }
+  }
+  if (notAssessed.length > 0) {
+    doc.moveDown(assessed.length > 0 ? 0.8 : 1.2);
+    drawNotAssessed(doc, notAssessed, analysis, languageName, t, width);
   }
 
   const footer = [[topic.qid, `${t.period}: ${periodText}`, `${t.generated} ${generatedOn}`].join("  ·  "), t.source].join("\n");
@@ -69,8 +81,20 @@ function labelled(doc: PDFKit.PDFDocument, label: string, value: string, width: 
   doc.fillColor(INK).text(value);
 }
 
-function drawLanguageTable(doc: PDFKit.PDFDocument, analysis: Analysis, t: Strings, width: number): void {
-  const languageNames = new Intl.DisplayNames([analysis.report_lang], { type: "language" });
+/** "pl - polski" style label of a language edition, in the report language. */
+function languageNamer(analysis: Analysis): (lang: string) => string {
+  const names = new Intl.DisplayNames([analysis.report_lang], { type: "language" });
+  return (lang) => `${lang} - ${names.of(lang) ?? lang}`;
+}
+
+function drawLanguageTable(
+  doc: PDFKit.PDFDocument,
+  languages: AssessedLanguage[],
+  analysis: Analysis,
+  languageName: (lang: string) => string,
+  t: Strings,
+  width: number,
+): void {
   const decimals = (digits: number, signDisplay: "auto" | "exceptZero") =>
     new Intl.NumberFormat(analysis.report_lang, { minimumFractionDigits: digits, maximumFractionDigits: digits, signDisplay });
   const views = decimals(2, "auto");
@@ -79,15 +103,10 @@ function drawLanguageTable(doc: PDFKit.PDFDocument, analysis: Analysis, t: Strin
 
   const left = "left" as const;
   const right = "right" as const;
-  const columns: { header: string; share: number; align: "left" | "right"; cell: (language: LanguageResult) => string }[] = [
-    { header: t.columnLanguage, share: 0.145, align: left, cell: (l) => `${l.lang} - ${languageNames.of(l.lang) ?? l.lang}` },
+  const columns: { header: string; share: number; align: "left" | "right"; cell: (language: AssessedLanguage) => string }[] = [
+    { header: t.columnLanguage, share: LANGUAGE_SHARE, align: left, cell: (l) => languageName(l.lang) },
     { header: t.columnArticle, share: 0.135, align: left, cell: (l) => l.title },
-    {
-      header: t.columnViewsPerMillion,
-      share: 0.1,
-      align: right,
-      cell: (l) => (l.views_per_million === null ? t.noData : views.format(l.views_per_million)),
-    },
+    { header: t.columnViewsPerMillion, share: 0.1, align: right, cell: (l) => views.format(l.views_per_million) },
     { header: t.columnRelativeGrowth, share: 0.11, align: right, cell: (l) => growth(l.relative_attention_growth_pct) },
     { header: t.columnRawGrowth, share: 0.1, align: right, cell: (l) => growth(l.raw_growth_pct) },
     { header: t.columnEditionGrowth, share: 0.09, align: right, cell: (l) => growth(l.edition_growth_pct) },
@@ -97,7 +116,7 @@ function drawLanguageTable(doc: PDFKit.PDFDocument, analysis: Analysis, t: Strin
       align: right,
       cell: (l) => t.monthsUp(l.recent_trend_consistency.positive_months, l.recent_trend_consistency.months_compared),
     },
-    { header: t.columnTrend, share: 0.105, align: left, cell: (l) => (l.trend === null ? t.noData : t.trend[l.trend]) },
+    { header: t.columnTrend, share: 0.105, align: left, cell: (l) => t.trend[l.trend] },
     { header: t.columnReliability, share: 0.13, align: left, cell: (l) => reliabilityText(l, t) },
   ];
   // Shares were sized to the widest cell and header word at 9 and 8 pt, in both report languages.
@@ -123,13 +142,51 @@ function drawLanguageTable(doc: PDFKit.PDFDocument, analysis: Analysis, t: Strin
   doc.fontSize(8);
   row(columns.map((column) => column.header), MUTED);
   doc.fontSize(9);
-  for (const language of analysis.languages) {
+  for (const language of languages) {
     row(columns.map((column) => column.cell(language)), INK);
   }
 }
 
+/** The group «Not assessed»: each language with the fixed wording for its reason, in --langs order and unranked. */
+function drawNotAssessed(
+  doc: PDFKit.PDFDocument,
+  languages: NotAssessedLanguage[],
+  analysis: Analysis,
+  languageName: (lang: string) => string,
+  t: Strings,
+  width: number,
+): void {
+  doc.fillColor(INK).fontSize(10).text(t.notAssessedHeading, MARGIN, doc.y, { width });
+  doc.moveDown(0.2).fillColor(MUTED).fontSize(8).text(t.notAssessedNote, MARGIN, doc.y, { width });
+  doc.moveDown(0.5).fontSize(9).fillColor(INK);
+
+  const labelWidth = LANGUAGE_SHARE * width;
+  for (const language of languages) {
+    const top = doc.y;
+    const label = languageName(language.lang);
+    const text = notAssessedText(language, analysis, t);
+    const labelOptions = { width: labelWidth - 6 };
+    const textOptions = { width: width - labelWidth };
+    doc.text(label, MARGIN, top, labelOptions);
+    doc.text(text, MARGIN + labelWidth, top, textOptions);
+    doc.x = MARGIN;
+    doc.y = top + Math.max(doc.heightOfString(label, labelOptions), doc.heightOfString(text, textOptions)) + 4;
+  }
+}
+
+function notAssessedText(language: NotAssessedLanguage, analysis: Analysis, t: Strings): string {
+  switch (language.reason) {
+    case "no_linked_article":
+      return t.noLinkedArticle;
+    case "short_history":
+      return t.shortHistory(language.title, language.max_months_available, analysis.period.months);
+    case "zero_baseline":
+      return t.zeroBaseline(analysis.growth_compares);
+  }
+}
+
 /** The level, then what lowered it: the direction reason is already in the months-up column. */
-function reliabilityText(language: LanguageResult, t: Strings): string {
+function reliabilityText(language: AssessedLanguage, t: Strings): string {
   if (language.trend_reliability === null) return t.noData;
   const downgrades = language.reliability_reasons.flatMap((reason) => {
     if (reason === LOW_VOLUME) return [t.lowVolume];

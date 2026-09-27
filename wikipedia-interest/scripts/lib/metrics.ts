@@ -35,16 +35,17 @@ export function recentSpikeMonth(reason: string): string | null {
 }
 export type RecentTrendConsistency = { positive_months: number; months_compared: number };
 
-export type LanguageMetrics = {
+/** The metrics of a language edition with data for the whole requested period. */
+export type AssessedMetrics = {
+  data_status: "ok";
   series: MonthPoint[];
-  views_per_million: number | null;
-  relative_attention_growth_pct: number | null;
-  raw_growth_pct: number | null;
+  views_per_million: number;
+  relative_attention_growth_pct: number;
+  raw_growth_pct: number;
   edition_growth_pct: number | null;
   recent_trend_consistency: RecentTrendConsistency;
-  /** Null when relative attention growth is null. */
-  trend: Trend | null;
-  /** A product heuristic, not a statistical confidence. Null unless the trend is up or down. */
+  trend: Trend;
+  /** A product heuristic, not a statistical confidence. Null for a flat trend. */
   trend_reliability: TrendReliability | null;
   reliability_method: typeof RELIABILITY_METHOD;
   /** Machine codes: why trend_reliability has its level. */
@@ -53,28 +54,53 @@ export type LanguageMetrics = {
   flags: string[];
 };
 
+/**
+ * Not enough data to assess the topic over the whole requested period; says nothing about low attention.
+ * - no_linked_article: the language edition has no article linked to the measured topic in Wikidata.
+ * - short_history: the article has data for only `max_months_available` months up to the end of the period.
+ * - zero_baseline: the median relative attention of the first 12 months is zero, so there is nothing to compare against.
+ */
+type Insufficient<Reason> = { data_status: "insufficient_data" } & Reason & { trend: null; trend_reliability: null };
+export type NoLinkedArticle = Insufficient<{ reason: "no_linked_article" }>;
+/** A linked article whose views cannot assess the topic. */
+export type InsufficientHistory = Insufficient<{ reason: "short_history"; max_months_available: number } | { reason: "zero_baseline" }>;
+export type InsufficientData = NoLinkedArticle | InsufficientHistory;
+
+export type LanguageMetrics = AssessedMetrics | InsufficientHistory;
+
 export type GrowthCompares = { first_12_months: MonthRange; last_12_months: MonthRange };
 
-/** Every metric of one language edition over the requested `months`, from its article and edition views. */
+/**
+ * Every metric of one language edition over the requested `months`, from its article and edition views;
+ * insufficient_data when they cannot assess the topic over the whole period.
+ */
 export function languageMetrics(months: string[], article: MonthlyViews, edition: MonthlyViews): LanguageMetrics {
+  // Months before the article's first month with data are missing (it did not exist yet), not zero views.
+  const first = months.findIndex((month) => article.has(month));
+  if (first !== 0) {
+    return insufficientData({ reason: "short_history", max_months_available: first === -1 ? 0 : months.length - first });
+  }
   const series = relativeAttentionSeries(months, article, edition);
   const raw = series.map((point) => point.article_views);
   // Unrounded: in a large edition, rounding to the series' 3 decimals would distort growth and tie months.
-  const relative = series.map((point) => (point.article_views === null ? null : (point.article_views / point.edition_views) * PER_MILLION));
+  const relative = series.map((point) => (point.article_views / point.edition_views) * PER_MILLION);
+  // Edition views are never zero, so a zero relative attention baseline is also a zero raw views baseline.
   const relativeGrowth = growthPct(relative);
   const rawGrowth = growthPct(raw);
+  if (relativeGrowth === null || rawGrowth === null) return insufficientData({ reason: "zero_baseline" });
   // Decided on the rounded growth, so the reported number and the trend never disagree.
-  const trend = relativeGrowth === null ? null : trendOf(relativeGrowth);
+  const trend = trendOf(relativeGrowth);
   const changes = yearOverYear(relative);
 
-  const spikes = spikeMonths(series);
+  const spikes = spikeMonths(raw, months);
   const recentSpikes = spikes.filter((month) => month >= months[months.length - YEAR]);
-  const lowVolume = (medianOf(raw.slice(-YEAR)) ?? 0) < LOW_VOLUME_MEDIAN_VIEWS;
-  const diverge = trend !== null && trend !== "flat" && rawGrowth !== null && trendOf(rawGrowth) === opposite(trend);
+  const lowVolume = median(raw.slice(-YEAR)) < LOW_VOLUME_MEDIAN_VIEWS;
+  const diverge = trend !== "flat" && trendOf(rawGrowth) === opposite(trend);
 
   return {
+    data_status: "ok",
     series,
-    views_per_million: roundOrNull(medianOf(relative.slice(-YEAR)), 2),
+    views_per_million: round(median(relative.slice(-YEAR)), 2),
     relative_attention_growth_pct: relativeGrowth,
     raw_growth_pct: rawGrowth,
     edition_growth_pct: growthPct(series.map((point) => point.edition_views)),
@@ -89,17 +115,22 @@ export function languageMetrics(months: string[], article: MonthlyViews, edition
   };
 }
 
+/** A language edition that cannot be assessed: it has no trend and no trend reliability. */
+export function insufficientData<Reason extends { reason: InsufficientData["reason"] }>(details: Reason): Insufficient<Reason> {
+  return { data_status: "insufficient_data", ...details, trend: null, trend_reliability: null };
+}
+
 /**
  * heuristic_v1: the level from the recent months in the trend's direction, then one step lower (never below `low`)
  * for low volume and one for any spike in the last 12 months. Raw/relative divergence does not lower it.
  */
 function reliability(
-  trend: Trend | null,
+  trend: Trend,
   changes: number[],
   lowVolume: boolean,
   recentSpikes: string[],
-): Pick<LanguageMetrics, "trend_reliability" | "reliability_method" | "reliability_reasons"> {
-  if (trend === null || trend === "flat") {
+): Pick<AssessedMetrics, "trend_reliability" | "reliability_method" | "reliability_reasons"> {
+  if (trend === "flat") {
     return { trend_reliability: null, reliability_method: RELIABILITY_METHOD, reliability_reasons: [] };
   }
   const matching = changes.filter((change) => (trend === "up" ? change > 0 : change < 0)).length;
@@ -120,12 +151,10 @@ function reliability(
  * Months whose raw views are above SPIKE_MEDIAN_MULTIPLE times the raw views median of the period.
  * None at a zero median: any month with views would be above it, which says nothing about a spike.
  */
-function spikeMonths(series: MonthPoint[]): string[] {
-  const periodMedian = medianOf(series.map((point) => point.article_views));
-  if (periodMedian === null || periodMedian === 0) return [];
-  return series
-    .filter((point) => point.article_views !== null && point.article_views > SPIKE_MEDIAN_MULTIPLE * periodMedian)
-    .map((point) => point.month);
+function spikeMonths(raw: number[], months: string[]): string[] {
+  const periodMedian = median(raw);
+  if (periodMedian === 0) return [];
+  return months.filter((_, i) => raw[i] > SPIKE_MEDIAN_MULTIPLE * periodMedian);
 }
 
 function opposite(trend: "up" | "down"): Trend {
@@ -138,15 +167,9 @@ function trendOf(growthPct: number): Trend {
   return "flat";
 }
 
-/** Each of the last 12 months minus the same month a year earlier; months without data on either side are left out. */
-function yearOverYear(values: (number | null)[]): number[] {
-  const changes: number[] = [];
-  for (let i = values.length - YEAR; i < values.length; i++) {
-    const current = values[i];
-    const yearEarlier = values[i - YEAR];
-    if (current !== null && yearEarlier !== null) changes.push(current - yearEarlier);
-  }
-  return changes;
+/** Each of the last 12 months minus the same month a year earlier. */
+function yearOverYear(values: number[]): number[] {
+  return values.slice(-YEAR).map((value, i) => value - values[values.length - 2 * YEAR + i]);
 }
 
 /** The months each growth compares: the first and the last 12 of the requested period. */
@@ -159,39 +182,28 @@ export function growthCompares(period: Period): GrowthCompares {
 
 /**
  * Change of the last-12-month median against the first-12-month median, in percent.
- * Null when the first 12 months have no data or a zero median, so there is nothing to compare against.
+ * Null when the first 12 months have a zero median, so there is nothing to compare against.
  */
-function growthPct(values: (number | null)[]): number | null {
-  const first = medianOf(values.slice(0, YEAR));
-  const last = medianOf(values.slice(-YEAR));
-  if (first === null || last === null || first === 0) return null;
-  return round((last / first - 1) * 100, 1);
-}
-
-function roundOrNull(value: number | null, digits: number): number | null {
-  return value === null ? null : round(value, digits);
-}
-
-function medianOf(values: (number | null)[]): number | null {
-  const known = values.filter((value) => value !== null);
-  return known.length === 0 ? null : median(known);
+function growthPct(values: number[]): number | null {
+  const first = median(values.slice(0, YEAR));
+  if (first === 0) return null;
+  return round((median(values.slice(-YEAR)) / first - 1) * 100, 1);
 }
 
 /**
  * Relative attention per month: article views per million views of the language edition.
- * Gaps after the article's first month with data are zero views; months before it are missing (null).
+ * The article has data from the first month on, so a month without data is zero views.
  */
 function relativeAttentionSeries(months: string[], article: MonthlyViews, edition: MonthlyViews): MonthPoint[] {
-  const first = months.findIndex((month) => article.has(month));
-  return months.map((month, i) => {
+  return months.map((month) => {
     // editionViews() fails unless every month of the period is published.
     const editionViews = edition.get(month) as number;
-    const articleViews = first === -1 || i < first ? null : (article.get(month) ?? 0);
+    const articleViews = article.get(month) ?? 0;
     return {
       month,
       article_views: articleViews,
       edition_views: editionViews,
-      relative_attention: articleViews === null ? null : round((articleViews / editionViews) * PER_MILLION, 3),
+      relative_attention: round((articleViews / editionViews) * PER_MILLION, 3),
     };
   });
 }

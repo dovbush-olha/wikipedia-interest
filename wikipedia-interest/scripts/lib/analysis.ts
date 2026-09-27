@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { UserError } from "./cli.ts";
-import type { GrowthCompares, LanguageMetrics } from "./metrics.ts";
+import type { AssessedMetrics, GrowthCompares, InsufficientHistory, NoLinkedArticle } from "./metrics.ts";
 import type { Period } from "./period.ts";
 
 // The analysis result: written by analyze.ts to analysis.json, read by report.ts.
@@ -25,12 +25,15 @@ export type MeasuredTopic = {
 
 export type MonthPoint = {
   month: string;
-  article_views: number | null;
+  article_views: number;
   edition_views: number;
-  relative_attention: number | null;
+  relative_attention: number;
 };
 
-export type LanguageResult = { lang: string; title: string } & LanguageMetrics;
+/** `title` is the current article title; null only when no article is linked. */
+export type AssessedLanguage = { lang: string; title: string } & AssessedMetrics;
+export type NotAssessedLanguage = ({ lang: string; title: null } & NoLinkedArticle) | ({ lang: string; title: string } & InsufficientHistory);
+export type LanguageResult = AssessedLanguage | NotAssessedLanguage;
 
 export type Analysis = {
   status: "ok";
