@@ -9,7 +9,7 @@ import { analyzeAstronomy, ASTRONOMY, runCli, tempDir } from "./helpers.ts";
 // Seam B: the report CLI, fed by a real analyze run on recorded fixtures.
 function analyze(reportLang: "uk" | "en", question: string): string {
   const runDir = tempDir();
-  const result = analyzeAstronomy(runDir, question, reportLang);
+  const result = analyzeAstronomy(runDir, question, { reportLang });
   assert.equal(result.status, 0, result.stderr);
   return runDir;
 }
