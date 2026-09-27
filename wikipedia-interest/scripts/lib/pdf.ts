@@ -2,7 +2,7 @@ import { join } from "node:path";
 import PDFDocument from "pdfkit";
 import type { Analysis, AssessedLanguage, NotAssessedLanguage } from "./analysis.ts";
 import { UserError } from "./cli.ts";
-import { LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
+import { HISTORY_CHECK_TRUNCATED, LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
 import { SKILL_DIR } from "./env.ts";
 import { STRINGS, type Strings } from "./strings.ts";
 
@@ -57,7 +57,15 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
     doc.moveDown(1.2);
     drawLanguageTable(doc, assessed, analysis, languageName, t, width);
     doc.moveDown(0.8).fillColor(MUTED).fontSize(8);
-    for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), t.heuristicNote]) {
+    const history = t.historyNote(
+      assessed.map((language) => ({
+        lang: language.lang,
+        titles: language.historical_titles,
+        checked: language.redirect_candidates_checked,
+        truncated: language.flags.includes(HISTORY_CHECK_TRUNCATED),
+      })),
+    );
+    for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), history, t.heuristicNote]) {
       doc.text(note, MARGIN, doc.y, { width }).moveDown(0.4);
     }
   }
@@ -194,6 +202,7 @@ function reliabilityText(language: AssessedLanguage, t: Strings): string {
   if (language.trend_reliability === null) return t.noData;
   const downgrades = language.reliability_reasons.flatMap((reason) => {
     if (reason === LOW_VOLUME) return [t.lowVolume];
+    if (reason === HISTORY_CHECK_TRUNCATED) return [t.historyCheckTruncated];
     const spike = recentSpikeMonth(reason);
     return spike === null ? [] : [t.spike(spike)];
   });

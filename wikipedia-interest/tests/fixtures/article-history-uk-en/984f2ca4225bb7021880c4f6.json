@@ -1,0 +1,738 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Minecraft",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 27815578,
+          "ns": 0,
+          "title": "Minecraft",
+          "redirects": [
+            {
+              "ns": 0,
+              "title": "Java edition"
+            },
+            {
+              "ns": 0,
+              "title": "Mine craft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft.net"
+            },
+            {
+              "ns": 0,
+              "title": "Total Miner: Forge"
+            },
+            {
+              "ns": 0,
+              "title": "MINECRAFT"
+            },
+            {
+              "ns": 0,
+              "title": "Total miner"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Order of the Stone"
+            },
+            {
+              "ns": 0,
+              "title": "Minceraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft 4k"
+            },
+            {
+              "ns": 0,
+              "title": "List of Minecraft clones"
+            },
+            {
+              "ns": 0,
+              "title": "List of Minecraft Clones"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Pocket Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Pi Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Zombie pigman"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft skins"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft – Pocket Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft seeds"
+            },
+            {
+              "ns": 0,
+              "title": "MineCraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft pe"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft ps4"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft xbox one"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft playstation 3"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft playstation 4"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft ps3"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft 360"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft xbox 360"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft xbox"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft xbox live arcade"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft xbox live"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft iphone"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft ipad"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft ipod"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft playstation vita"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft ps vita"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft handheld"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft pc"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft (video game)"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Xbox 360"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Enderman"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Pocket Edition"
+            },
+            {
+              "ns": 0,
+              "title": "CraftBukkit"
+            },
+            {
+              "ns": 0,
+              "title": "Redstone (gaming)"
+            },
+            {
+              "ns": 0,
+              "title": "Enderdragon"
+            },
+            {
+              "ns": 0,
+              "title": "Mine Craft"
+            },
+            {
+              "ns": 0,
+              "title": "Mincraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft - Pocket Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Windows 10 Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft PE"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft redstone"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Playstation 3 Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Playstation 4 Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Playstation Vita Edition"
+            },
+            {
+              "ns": 0,
+              "title": "MCPE"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Educational Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Switch Version"
+            },
+            {
+              "ns": 0,
+              "title": "Minekraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Education Edition"
+            },
+            {
+              "ns": 0,
+              "title": "MC:PE"
+            },
+            {
+              "ns": 0,
+              "title": "MinecraftEDU"
+            },
+            {
+              "ns": 0,
+              "title": "MinecraftEdu"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Education Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Java Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Java"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Java Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Total Miner"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Bedrock Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Nether"
+            },
+            {
+              "ns": 0,
+              "title": "Applications of Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecrafter"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: New Nintendo 3DS Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Miencraft"
+            },
+            {
+              "ns": 0,
+              "title": "Bedrock game engine"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Classic"
+            },
+            {
+              "ns": 0,
+              "title": "Java Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Redstone (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Netherite"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft China"
+            },
+            {
+              "ns": 0,
+              "title": "Zombie (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft clone"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft (game)"
+            },
+            {
+              "ns": 0,
+              "title": "Endermen"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraf"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft in education"
+            },
+            {
+              "ns": 0,
+              "title": "1.19.84"
+            },
+            {
+              "ns": 0,
+              "title": "Saveminecraft"
+            },
+            {
+              "ns": 0,
+              "title": "＃saveminecraft"
+            },
+            {
+              "ns": 0,
+              "title": "UCraft"
+            },
+            {
+              "ns": 0,
+              "title": "StoneShire"
+            },
+            {
+              "ns": 0,
+              "title": "Discovery (video game)"
+            },
+            {
+              "ns": 0,
+              "title": "MINE CRAFT"
+            },
+            {
+              "ns": 0,
+              "title": "我的世界"
+            },
+            {
+              "ns": 0,
+              "title": "Wǒ de shìjiè"
+            },
+            {
+              "ns": 0,
+              "title": "Controversies surrounding Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft chat reporting"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft chat reporting controversy"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft controversies"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft chat reporting feature"
+            },
+            {
+              "ns": 0,
+              "title": "Mineraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft chat report"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft chat report feature"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft player chat report feature"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft player chat reporting feature"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft player chat report"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft player chat reporting"
+            },
+            {
+              "ns": 0,
+              "title": "Zombified Piglin"
+            },
+            {
+              "ns": 0,
+              "title": "Piglin"
+            },
+            {
+              "ns": 0,
+              "title": "Zombie Pigman"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Bedrock Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Bedrock"
+            },
+            {
+              "ns": 0,
+              "title": "Bedrock Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Development of Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Skeleton (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Education"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Education"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft PC Gamer Demo"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft PC Gamer Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: PC Gamer Demo"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: PC Gamer Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft.com"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft for Windows"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Windows 10 Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Windows Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Windows Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Windows 11 Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Windows 11 Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft for Microsoft Windows"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Windows"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Windows"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Windows 10"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Windows 10"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Windows 11"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Windows 11"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft for Windows 10"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft for Windows 11"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Java"
+            },
+            {
+              "ns": 0,
+              "title": "Vivecraft"
+            },
+            {
+              "ns": 0,
+              "title": "The End (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Zombie piglin"
+            },
+            {
+              "ns": 0,
+              "title": "Zombified piglin"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraftian"
+            },
+            {
+              "ns": 0,
+              "title": "History of Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Reception of Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Cultural impact of Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Gear VR Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft clones"
+            },
+            {
+              "ns": 0,
+              "title": "Microsoft Minecraft"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft with RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Bedrock RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Bedrock RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Bedrock with RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Bedrock with RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Bedrock Edition with RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Bedrock Edition RTX"
+            },
+            {
+              "ns": 0,
+              "title": "Wither (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft Marketplace"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Play with Friends"
+            },
+            {
+              "ns": 0,
+              "title": "Resource pack"
+            },
+            {
+              "ns": 0,
+              "title": "Minecrsft"
+            },
+            {
+              "ns": 0,
+              "title": "The Nether (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "MCBE"
+            },
+            {
+              "ns": 0,
+              "title": "Wither skeleton"
+            },
+            {
+              "ns": 0,
+              "title": "Ender Dragon"
+            },
+            {
+              "ns": 0,
+              "title": "Ghast (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Allumeria"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft: Pi Edition"
+            },
+            {
+              "ns": 0,
+              "title": "Enderman"
+            },
+            {
+              "ns": 0,
+              "title": "2026 Minecraft source code leak"
+            },
+            {
+              "ns": 0,
+              "title": "Overworld (Minecraft)"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft cultural impact"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft's cultural impact"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft and LGBTQIA+"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft and LGBTQIA"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft and LGBTQ"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft and LGBT"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft JE"
+            },
+            {
+              "ns": 0,
+              "title": "Minecraft BE"
+            },
+            {
+              "ns": 0,
+              "title": "The Sift"
+            },
+            {
+              "ns": 0,
+              "title": "You may not rest now, there are monsters nearby"
+            }
+          ]
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T09:45:31.523Z"
+}

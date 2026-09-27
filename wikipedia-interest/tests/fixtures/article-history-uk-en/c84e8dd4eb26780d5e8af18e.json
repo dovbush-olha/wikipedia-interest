@@ -1,0 +1,14 @@
+{
+  "url": "https://uk.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&list=logevents&letype=move&letitle=%D0%9D%D0%B5%D0%B1%D0%B5%D1%81%D0%BD%D1%96+%D1%81%D0%B2%D1%96%D1%82%D0%B8%D0%BB%D0%B0&leprop=ids%7Ctitle&lelimit=max",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "limits": {
+      "logevents": 500
+    },
+    "query": {
+      "logevents": []
+    }
+  },
+  "fetched_at": "2026-09-27T09:45:30.590Z"
+}

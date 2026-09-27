@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { growthCompares, languageMetrics } from "../scripts/lib/metrics.ts";
+import { growthCompares, languageMetrics, type HistoryCheck } from "../scripts/lib/metrics.ts";
 import type { MonthlyViews } from "../scripts/lib/pageviews.ts";
 import { addMonths, monthsOf } from "../scripts/lib/period.ts";
 
@@ -22,8 +22,8 @@ function months(start: string, count: number): string[] {
 const flat = (count: number, value: number) => Array<number>(count).fill(value);
 
 /** The metrics of a language edition that has enough data to be assessed. */
-function assessed(periodMonths: string[], article: MonthlyViews, edition: MonthlyViews) {
-  const metrics = languageMetrics(periodMonths, article, edition);
+function assessed(periodMonths: string[], article: MonthlyViews, edition: MonthlyViews, history?: HistoryCheck) {
+  const metrics = languageMetrics(periodMonths, article, edition, history);
   assert.ok(metrics.data_status === "ok", `expected an assessed language, got ${JSON.stringify(metrics)}`);
   return metrics;
 }
@@ -156,6 +156,9 @@ describe("trend reliability, heuristic_v1", () => {
   });
 });
 
+/** Some of the article's redirects were not checked for former titles. */
+const TRUNCATED: HistoryCheck = { truncated: true };
+
 describe("trend reliability downgrades", () => {
   it("lowers high to moderate for low volume", () => {
     // Raw views median of the last 12 months: 80, below 100.
@@ -218,6 +221,43 @@ describe("trend reliability downgrades", () => {
     assert.equal(metrics.trend_reliability, "low");
     assert.deepEqual(metrics.reliability_reasons, ["direction_matches_in_9_of_12_recent_months", "low_volume", "recent_spike:2026-08"]);
     assert.deepEqual(metrics.flags, ["spike:2026-08", "low_volume"]);
+  });
+
+  it("lowers high to moderate when the history check was truncated", () => {
+    const metrics = assessed(MONTHS_24, views("2024-09", [...flat(12, 1000), ...flat(12, 1500)]), EDITION_24, TRUNCATED);
+
+    assert.equal(metrics.trend_reliability, "moderate");
+    assert.deepEqual(metrics.reliability_reasons, ["direction_matches_in_12_of_12_recent_months", "history_check_truncated"]);
+    assert.deepEqual(metrics.flags, ["history_check_truncated"]);
+  });
+
+  it("keeps the level when the history check was complete", () => {
+    const metrics = assessed(MONTHS_24, views("2024-09", [...flat(12, 1000), ...flat(12, 1500)]), EDITION_24, { truncated: false });
+
+    assert.equal(metrics.trend_reliability, "high");
+    assert.deepEqual(metrics.flags, []);
+  });
+
+  it("lowers one step for each of low volume, a recent spike and a truncated history check, down to low", () => {
+    const metrics = assessed(MONTHS_24, views("2024-09", [...flat(12, 50), ...flat(3, 45), ...flat(8, 80), 400]), EDITION_24, TRUNCATED);
+
+    assert.equal(metrics.trend_reliability, "low");
+    assert.deepEqual(metrics.reliability_reasons, [
+      "direction_matches_in_9_of_12_recent_months",
+      "low_volume",
+      "recent_spike:2026-08",
+      "history_check_truncated",
+    ]);
+    assert.deepEqual(metrics.flags, ["spike:2026-08", "low_volume", "history_check_truncated"]);
+  });
+
+  it("flags a truncated history check for a flat trend too, which has no reliability to lower", () => {
+    const metrics = assessed(MONTHS_24, views("2024-09", [...flat(12, 1000), ...flat(12, 1050)]), EDITION_24, TRUNCATED);
+
+    assert.equal(metrics.trend, "flat");
+    assert.equal(metrics.trend_reliability, null);
+    assert.deepEqual(metrics.reliability_reasons, []);
+    assert.deepEqual(metrics.flags, ["history_check_truncated"]);
   });
 
   it("never lowers below low", () => {

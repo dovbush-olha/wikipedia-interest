@@ -44,8 +44,17 @@ export async function editionViews(lang: string, period: Period): Promise<Monthl
   );
 }
 
-/** Human views of one article title, per month. */
-export async function articleViews(lang: string, title: string, period: Period): Promise<MonthlyViews> {
+/** Human views of an article under all its `titles`, current and former, summed per month. */
+export async function articleViews(lang: string, titles: string[], period: Period): Promise<MonthlyViews> {
+  const total: MonthlyViews = new Map();
+  for (const views of await Promise.all(titles.map((title) => titleViews(lang, title, period)))) {
+    for (const [month, count] of views) total.set(month, (total.get(month) ?? 0) + count);
+  }
+  return total;
+}
+
+/** Human views of one title, per month. */
+async function titleViews(lang: string, title: string, period: Period): Promise<MonthlyViews> {
   const article = encodeURIComponent(title.replaceAll(" ", "_"));
   const url = `${BASE}/per-article/${lang}.wikipedia/${ACCESS_AGENT}/${article}/monthly/${range(period)}`;
   const { status, body } = await getJson(url);

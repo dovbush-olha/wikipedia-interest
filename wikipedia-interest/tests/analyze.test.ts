@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { analyzeAstronomy as analyzeAstronomyWith, analyzeFasting, ASTRONOMY, fixtureEnv, noNetworkEnv, runCli, tempDir } from "./helpers.ts";
+import {
+  analyzeAstronomy as analyzeAstronomyWith,
+  analyzeFasting,
+  analyzeHistory,
+  ASTRONOMY,
+  fixtureEnv,
+  noNetworkEnv,
+  runCli,
+  tempDir,
+} from "./helpers.ts";
 
 // Seam A: the analyze CLI, replaying recorded Wikimedia responses offline.
 const QUESTION = "Чи зростає інтерес до астрономії в україномовній Wikipedia?";
@@ -87,7 +96,8 @@ describe("analyze --qid", () => {
       last_12_months: { start: "2025-09", end: "2026-08" },
     });
     for (const [i, expected] of EXPECTED_TREND_METRICS.entries()) {
-      const { lang, title: _title, views_per_million: _views, ...metrics } = out.languages[i];
+      const { lang, title: _title, historical_titles: _former, redirect_candidates_checked: _checked, views_per_million: _views, ...metrics } =
+        out.languages[i];
       assert.deepEqual({ lang, ...metrics }, expected);
     }
     assert.deepEqual(analysisIn(outDir).growth_compares, out.growth_compares);
@@ -160,19 +170,21 @@ describe("analyze insufficient data", () => {
     const result = analyzeFasting(outDir, question);
     assert.equal(result.status, 0, result.stderr);
 
-    // The eu article has views from 2025-12: 2025-12..2026-08 is 9 of the 24 requested months.
-    const eu = JSON.parse(result.stdout).languages.find((l: { lang: string }) => l.lang === "eu");
-    assert.deepEqual(eu, {
-      lang: "eu",
-      title: "Aldizkako barau",
+    // The xh article has views from 2025-04: 2025-04..2026-08 is 17 of the 24 requested months.
+    const xh = JSON.parse(result.stdout).languages.find((l: { lang: string }) => l.lang === "xh");
+    assert.deepEqual(xh, {
+      lang: "xh",
+      title: "Intermitent fasting",
+      historical_titles: [],
+      redirect_candidates_checked: 0,
       data_status: "insufficient_data",
       reason: "short_history",
-      max_months_available: 9,
+      max_months_available: 17,
       trend: null,
       trend_reliability: null,
     });
     // Not silently analyzed over a shorter period: no series and no metrics.
-    assert.deepEqual(analysisIn(outDir).languages[2], eu);
+    assert.deepEqual(analysisIn(outDir).languages[2], xh);
   });
 
   it("keeps assessing the other languages over the whole requested period, in the --langs order", () => {
@@ -187,7 +199,7 @@ describe("analyze insufficient data", () => {
       [
         ["cs", "ok"],
         ["pl", "insufficient_data"],
-        ["eu", "insufficient_data"],
+        ["xh", "insufficient_data"],
         ["uk", "ok"],
       ],
     );
@@ -203,6 +215,90 @@ describe("analyze insufficient data", () => {
     assert.equal(result.status, 1);
     assert.equal(result.stdout, "");
     assert.match(result.stderr, /^Error: Wikimedia has no pageviews for ua\.wikipedia\. Check the language code in --langs\./);
+  });
+});
+
+describe("analyze article history", () => {
+  /** The one language of a run, from analysis.json, with its monthly article views keyed by month. */
+  function onlyLanguage(outDir: string) {
+    const [language] = analysisIn(outDir).languages;
+    const views = new Map<string, number>(language.series?.map((point: { month: string; article_views: number }) => [point.month, point.article_views]));
+    return { language, views };
+  }
+
+  it("adds the views of a title the article was renamed from, over the whole period", () => {
+    // "Aldizkako baraualdi" was renamed to "Aldizkako barau" on 2025-12-02; the current title alone has views only from 2025-12.
+    const outDir = tempDir();
+    const result = analyzeFasting(outDir, "Is interest in intermittent fasting growing in Basque Wikipedia?", { reportLang: "en", langs: "eu" });
+    assert.equal(result.status, 0, result.stderr);
+
+    const [eu] = JSON.parse(result.stdout).languages;
+    assert.equal(eu.title, "Aldizkako barau");
+    assert.deepEqual(eu.historical_titles, ["Aldizkako baraualdi"]);
+    assert.equal(eu.redirect_candidates_checked, 1);
+    assert.equal(eu.data_status, "ok");
+    const { views } = onlyLanguage(outDir);
+    // Recorded views of the current + the former title: before the rename, after it, and at the end of the period.
+    assert.equal(views.get("2024-09"), 0 + 3);
+    assert.equal(views.get("2025-12"), 3 + 1);
+    assert.equal(views.get("2026-08"), 2 + 1);
+  });
+
+  it("adds the views of every title in a chain of renames", () => {
+    // Малярчук Тетяна Володимирівна → Малярчук Таня → Таня Малярчук, both on 2025-02-01.
+    const outDir = tempDir();
+    const result = analyzeHistory(outDir, "Q9357655", "uk");
+    assert.equal(result.status, 0, result.stderr);
+
+    const [uk] = JSON.parse(result.stdout).languages;
+    assert.equal(uk.title, "Таня Малярчук");
+    assert.deepEqual(uk.historical_titles, ["Малярчук Тетяна Володимирівна", "Малярчук Таня"]);
+    assert.equal(uk.redirect_candidates_checked, 4);
+    const { views } = onlyLanguage(outDir);
+    assert.equal(views.get("2024-09"), 8 + 224 + 0);
+    assert.equal(views.get("2025-02"), 147 + 65 + 1);
+  });
+
+  it("leaves out synonym redirects that were never a title of the article", () => {
+    // cs Astronomie has 3 redirects (Hvězdářství, Hvězdář, Hvězdoprava) and no move logged for any of them.
+    const outDir = tempDir();
+    const result = analyzeAstronomy(outDir);
+    assert.equal(result.status, 0, result.stderr);
+
+    const cs = JSON.parse(result.stdout).languages[1];
+    assert.deepEqual(cs.historical_titles, []);
+    assert.equal(cs.redirect_candidates_checked, 3);
+    // The recorded views of the current title alone.
+    assert.equal(analysisIn(outDir).languages[1].series[23].article_views, 333);
+  });
+
+  it("leaves out a redirect whose logged move was of another page", () => {
+    // "Планети" now redirects to "Планета", but the move logged for it moved the Holst suite, another page, away from it.
+    const outDir = tempDir();
+    const result = analyzeHistory(outDir, "Q634", "uk");
+    assert.equal(result.status, 0, result.stderr);
+
+    const [uk] = JSON.parse(result.stdout).languages;
+    assert.equal(uk.title, "Планета");
+    assert.deepEqual(uk.historical_titles, []);
+    assert.equal(uk.redirect_candidates_checked, 3);
+    assert.equal(onlyLanguage(outDir).views.get("2024-09"), 2639);
+  });
+
+  it("checks at most 50 redirects, flags the check as truncated and lowers trend reliability one step", () => {
+    const outDir = tempDir();
+    const result = analyzeHistory(outDir, "Q49740", "en");
+    assert.equal(result.status, 0, result.stderr);
+
+    const [en] = JSON.parse(result.stdout).languages;
+    assert.equal(en.title, "Minecraft");
+    assert.equal(en.redirect_candidates_checked, 50);
+    assert.deepEqual(en.historical_titles, []);
+    assert.equal(en.trend, "down");
+    // 9 of 12 recent months down is high; the truncated check lowers it to moderate.
+    assert.equal(en.trend_reliability, "moderate");
+    assert.deepEqual(en.reliability_reasons, ["direction_matches_in_9_of_12_recent_months", "history_check_truncated"]);
+    assert.deepEqual(en.flags, ["history_check_truncated"]);
   });
 });
 

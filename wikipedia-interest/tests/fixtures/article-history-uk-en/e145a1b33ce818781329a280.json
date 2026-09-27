@@ -1,0 +1,33 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q634&props=labels%7Cdescriptions%7Csitelinks&languages=en&sitefilter=ukwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q634": {
+        "type": "item",
+        "id": "Q634",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "planet"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "celestial body directly orbiting a star or stellar remnant"
+          }
+        },
+        "sitelinks": {
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Планета",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T09:45:30.143Z"
+}

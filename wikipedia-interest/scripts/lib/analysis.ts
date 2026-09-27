@@ -26,9 +26,13 @@ export type MonthPoint = {
   relative_attention: number;
 };
 
-/** `title` is the current article title; null only when no article is linked. */
-export type AssessedLanguage = { lang: string; title: string } & AssessedMetrics;
-export type NotAssessedLanguage = ({ lang: string; title: null } & NoLinkedArticle) | ({ lang: string; title: string } & InsufficientHistory);
+/**
+ * `title` is the current article title; null only when no article is linked.
+ * Views of the article include its `historical_titles`, which the move log confirmed among `redirect_candidates_checked` redirects.
+ */
+type Article = { lang: string; title: string; historical_titles: string[]; redirect_candidates_checked: number };
+export type AssessedLanguage = Article & AssessedMetrics;
+export type NotAssessedLanguage = ({ lang: string; title: null } & NoLinkedArticle) | (Article & InsufficientHistory);
 export type LanguageResult = AssessedLanguage | NotAssessedLanguage;
 
 export type Analysis = {
