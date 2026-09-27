@@ -13,7 +13,7 @@ const TITLE_SIZE = 10;
 const LABEL_SIZE = 7;
 const LEGEND_SIZE = 8;
 const LEGEND_GAP = 12;
-const PLOT_HEIGHT = 72;
+const PLOT_HEIGHT = 64;
 const SWATCH = 14;
 const LINE_WIDTH = 1.5;
 

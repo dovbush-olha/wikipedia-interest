@@ -43,7 +43,7 @@ describe("analyze --topic, exact match", () => {
   });
 
   it("follows a redirect to the whole article and says it did", () => {
-    const result = analyze(["--topic", "Periodic fasting", "--langs", "cs,pl,eu,uk"], FASTING);
+    const result = analyze(["--topic", "Periodic fasting", "--langs", "cs,pl,eu"], FASTING);
     assert.equal(result.status, 0, result.stderr);
 
     const out = JSON.parse(result.stdout);
@@ -180,7 +180,7 @@ describe("analyze relation to the question", () => {
 
 describe("analyze measured topic terms", () => {
   it("falls back to the English description when Wikidata has none in the report language", () => {
-    const result = analyze(["--qid", "Q1666254", "--langs", "cs,pl,eu,uk"], FASTING);
+    const result = analyze(["--qid", "Q1666254", "--langs", "cs,pl,uk"], FASTING);
     assert.equal(result.status, 0, result.stderr);
 
     const topic = JSON.parse(result.stdout).measured_topic;

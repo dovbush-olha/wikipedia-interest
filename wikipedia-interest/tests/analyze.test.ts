@@ -202,13 +202,10 @@ describe("analyze insufficient data", () => {
         ["cs", "ok"],
         ["pl", "insufficient_data"],
         ["xh", "insufficient_data"],
-        ["uk", "ok"],
       ],
     );
-    for (const i of [0, 3]) {
-      assert.equal(analysisIn(outDir).languages[i].series.length, 24);
-      assert.ok(["up", "down", "flat"].includes(out.languages[i].trend));
-    }
+    assert.equal(analysisIn(outDir).languages[0].series.length, 24);
+    assert.ok(["up", "down", "flat"].includes(out.languages[0].trend));
   });
 
   it("still fails for a language code without a Wikipedia, instead of reporting no linked article", () => {

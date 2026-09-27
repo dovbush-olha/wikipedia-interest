@@ -1,0 +1,14 @@
+{
+  "url": "https://de.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&list=logevents&letype=move&letitle=Intervallfasten&leprop=ids%7Ctitle&lelimit=max",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "limits": {
+      "logevents": 500
+    },
+    "query": {
+      "logevents": []
+    }
+  },
+  "fetched_at": "2026-09-27T13:56:49.756Z"
+}

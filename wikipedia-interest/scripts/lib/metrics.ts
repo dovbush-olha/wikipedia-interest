@@ -31,10 +31,18 @@ export type TrendReliability = (typeof RELIABILITY_LEVELS)[number];
 export const LOW_VOLUME = "low_volume";
 export const HISTORY_CHECK_TRUNCATED = "history_check_truncated";
 const RECENT_SPIKE = "recent_spike:";
+/** Flag codes for a spike month and for raw views and relative attention moving in opposite directions. */
+const SPIKE = "spike:";
+export const RAW_RELATIVE_DIVERGE = "raw_relative_diverge";
 
 /** The spike month of a `recent_spike:YYYY-MM` reason, else null. */
 export function recentSpikeMonth(reason: string): string | null {
   return reason.startsWith(RECENT_SPIKE) ? reason.slice(RECENT_SPIKE.length) : null;
+}
+
+/** The spike month of a `spike:YYYY-MM` flag, else null. */
+export function spikeMonth(flag: string): string | null {
+  return flag.startsWith(SPIKE) ? flag.slice(SPIKE.length) : null;
 }
 export type RecentTrendConsistency = { positive_months: number; months_compared: number };
 
@@ -123,9 +131,9 @@ export function languageMetrics(
     trend,
     ...reliability(trend, changes, lowVolume, recentSpikes, history.truncated),
     flags: [
-      ...spikes.map((month) => `spike:${month}`),
+      ...spikes.map((month) => `${SPIKE}${month}`),
       ...(lowVolume ? [LOW_VOLUME] : []),
-      ...(diverge ? ["raw_relative_diverge"] : []),
+      ...(diverge ? [RAW_RELATIVE_DIVERGE] : []),
       ...historyFlags,
     ],
   };
