@@ -1,0 +1,20 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&titles=English+language&redirects=1&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 8569916,
+          "ns": 0,
+          "title": "English language",
+          "pageprops": {
+            "wikibase_item": "Q1860"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:22:20.572Z"
+}

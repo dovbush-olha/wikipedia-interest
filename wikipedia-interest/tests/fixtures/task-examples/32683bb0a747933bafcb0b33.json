@@ -1,0 +1,38 @@
+{
+  "url": "https://cs.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Angli%C4%8Dtina",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 7296,
+          "ns": 0,
+          "title": "Angličtina",
+          "redirects": [
+            {
+              "ns": 0,
+              "title": "Anglicky"
+            },
+            {
+              "ns": 0,
+              "title": "Anglický jazyk"
+            },
+            {
+              "ns": 0,
+              "title": "English"
+            },
+            {
+              "ns": 0,
+              "title": "Spelování"
+            }
+          ]
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T14:22:21.096Z"
+}

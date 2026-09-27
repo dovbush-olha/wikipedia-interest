@@ -120,6 +120,14 @@ export function analyzeLongPeriod(
   );
 }
 
+// The three example requests of the task as SKILL.md turns them into commands, recorded on 2026-09-27 with a fixed "today"
+// of 2026-09-15 for the period 2024-09..2026-08, to run the whole skill offline on a cheap model:
+// Q1666254 (intermittent fasting) in pl and cs, where pl has no article linked in Wikidata; Q333 (astronomy) in uk;
+// Q1860 (English language), the proxy for learning English, in uk, pl and cs. Also recorded: each topic as English and
+// Ukrainian --topic text, pl and cs in both orders and the needs_choice of "learning English", all for the paths a model may take,
+// and Q333 in uk and cs.
+export const TASK_EXAMPLES = fixtureEnv("task-examples", "2026-09-15");
+
 /** Rewrites the run's analysis.json: for the report states no recorded fixture has, such as a raw/relative divergence. */
 export function editAnalysis(runDir: string, edit: (analysis: Analysis) => void): void {
   const file = join(runDir, "analysis.json");
