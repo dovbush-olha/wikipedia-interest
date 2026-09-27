@@ -1,0 +1,62 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q333&props=labels%7Cdescriptions%7Csitelinks&languages=en&sitefilter=ukwiki%7Ccswiki%7Cplwiki%7Cenwiki%7Cdewiki%7Cfrwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q333": {
+        "type": "item",
+        "id": "Q333",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "astronomy"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "natural science studying celestial objects and phenomena in the cosmos"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Astronomie",
+            "badges": []
+          },
+          "dewiki": {
+            "site": "dewiki",
+            "title": "Astronomie",
+            "badges": []
+          },
+          "enwiki": {
+            "site": "enwiki",
+            "title": "Astronomy",
+            "badges": [
+              "Q17437798"
+            ]
+          },
+          "frwiki": {
+            "site": "frwiki",
+            "title": "Astronomie",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Astronomia",
+            "badges": [
+              "Q17437798"
+            ]
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Астрономія",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T10:22:39.174Z"
+}

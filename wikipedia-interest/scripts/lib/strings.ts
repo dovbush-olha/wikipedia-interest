@@ -1,5 +1,6 @@
 import type { ReportLang } from "./analysis.ts";
 import {
+  BASELINE_INDEX,
   FLAT_GROWTH_PCT,
   HIGH_RELIABILITY_MIN_MONTHS as HIGH,
   LOW_VOLUME_MEDIAN_VIEWS,
@@ -24,6 +25,8 @@ const en = {
   measuredTopic: "Measured topic",
   assumption: "Assumption",
   proxyAssumption: "the measured topic is a proxy for the topic of the question; it may be broader or narrower than that topic.",
+  chartTitle: "Relative attention index",
+  chartBaseline: (compares: GrowthCompares) => `${BASELINE_INDEX} = median of ${range(compares.first_12_months)}`,
   columnLanguage: "Language edition",
   columnArticle: "Article",
   columnViewsPerMillion: "Views per million",
@@ -92,6 +95,8 @@ const uk: Strings = {
   measuredTopic: "Виміряна тема",
   assumption: "Припущення",
   proxyAssumption: "виміряна тема - проксі теми питання, вона може бути ширшою або вужчою за тему питання.",
+  chartTitle: "Індекс відносної уваги",
+  chartBaseline: (compares) => `${BASELINE_INDEX} = медіана за ${range(compares.first_12_months)}`,
   columnLanguage: "Мовний розділ",
   columnArticle: "Стаття",
   columnViewsPerMillion: "Переглядів на мільйон",

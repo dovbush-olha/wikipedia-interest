@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { growthCompares, languageMetrics, type HistoryCheck } from "../scripts/lib/metrics.ts";
+import { growthCompares, indexedAttention, languageMetrics, type HistoryCheck } from "../scripts/lib/metrics.ts";
 import type { MonthlyViews } from "../scripts/lib/pageviews.ts";
 import { addMonths, monthsOf } from "../scripts/lib/period.ts";
 
@@ -451,5 +451,23 @@ describe("insufficient data", () => {
 
   it("marks an assessed language with data_status ok", () => {
     assert.equal(languageMetrics(MONTHS_24, views("2024-09", flat(24, 100)), EDITION_24).data_status, "ok");
+  });
+});
+
+describe("indexed relative attention", () => {
+  it("indexes every month to the median of the first 12 months = 100", () => {
+    // First year: 6 months at 40 and 6 at 60 (median 50); last year 75, with one month without views.
+    const article = views("2024-09", [...flat(6, 40), ...flat(6, 60), ...flat(11, 75), 0]);
+    const metrics = assessed(MONTHS_24, article, EDITION_24);
+
+    assert.deepEqual(indexedAttention(metrics.series), [...flat(6, 80), ...flat(6, 120), ...flat(11, 150), 0]);
+  });
+
+  it("indexes the unrounded relative attention of a very large edition", () => {
+    // 1 and then 2 views of 3,000,000,000 round to a relative attention of 0.000 but still double.
+    const article = views("2024-09", [...flat(12, 1), ...flat(12, 2)]);
+    const metrics = assessed(MONTHS_24, article, views("2024-09", flat(24, 3_000_000_000)));
+
+    assert.deepEqual(indexedAttention(metrics.series), [...flat(12, 100), ...flat(12, 200)]);
   });
 });

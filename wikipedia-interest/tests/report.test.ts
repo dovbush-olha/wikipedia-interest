@@ -1,10 +1,21 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { STRINGS } from "../scripts/lib/strings.ts";
-import { analyzeAstronomy, analyzeFasting, analyzeHistory, ARTICLE_HISTORY, ASTRONOMY, FASTING, runCli, tempDir } from "./helpers.ts";
+import {
+  analyzeAstronomy,
+  analyzeFasting,
+  analyzeHistory,
+  analyzeLongPeriod,
+  ARTICLE_HISTORY,
+  ASTRONOMY,
+  FASTING,
+  LONG_PERIOD,
+  runCli,
+  tempDir,
+} from "./helpers.ts";
 
 // Seam B: the report CLI, fed by a real analyze run on recorded fixtures.
 function analyze(reportLang: "uk" | "en", question: string): string {
@@ -184,6 +195,7 @@ describe("report", () => {
     assert.ok(notAssessed.includes(squash("xh: no historical titles; 0 redirect candidates checked.")), notAssessed);
     assert.ok(!notAssessed.includes(squash("pl: no historical titles")), notAssessed);
     assert.ok(!table.includes(squash(STRINGS.en.columnViewsPerMillion)), table);
+    assert.ok(!squash(pdf.text).includes(squash(STRINGS.en.chartTitle)), pdf.text);
   });
 
   it("names the historical titles counted in article views and the redirects checked, per language (uk)", async () => {
@@ -242,6 +254,68 @@ describe("report", () => {
 
     const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
     assert.ok(!text.includes(squash("Not assessed")), text);
+  });
+
+  /** The page text of the chart: from its title to the header of the table under it. */
+  function chartText(text: string, reportLang: "uk" | "en"): string {
+    const t = STRINGS[reportLang];
+    const start = text.indexOf(squash(t.chartTitle));
+    const end = text.indexOf(squash(t.columnLanguage));
+    assert.ok(start !== -1 && start < end, `no chart before the table in ${text}`);
+    return text.slice(start, end);
+  }
+
+  it("draws the indexed relative attention chart between the measured topic and the table (uk)", async () => {
+    const runDir = analyze("uk", "Чи зростає інтерес до астрономії?");
+    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+
+    const pdf = await readPdf(join(runDir, "report.pdf"));
+    assert.equal(pdf.pages, 1);
+    const text = squash(pdf.text);
+    assert.ok(text.indexOf(squash("(Q333)")) < text.indexOf(squash(STRINGS.uk.chartTitle)), pdf.text);
+    const chart = chartText(text, "uk");
+    assert.ok(chart.includes(squash("100 = медіана за 2024-09 - 2025-08")), chart);
+    // Quarterly month labels of the 24-month period, and one legend entry per language edition code.
+    for (const label of ["2024-10", "2025-01", "2026-07", "uk", "cs", "pl"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
+  });
+
+  it("keeps a chart of 6 assessed language editions over 120 months, a long question and a proxy on one page", async () => {
+    const runDir = tempDir();
+    const question =
+      "Which of these six language editions shows the most promising relative attention to astronomy for our next research round, " +
+      "and how far can we trust the trend over the last ten years?";
+    const reason = "No article covers amateur astronomy in every language edition; astronomy as a whole is broader than the topic of the question.";
+    const result = analyzeLongPeriod(runDir, "Q333", "uk,cs,pl,en,de,fr", ["--user-question", question, "--proxy-reason", reason]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(runCli("report", ["--run-dir", runDir], LONG_PERIOD).status, 0);
+
+    const pdf = await readPdf(join(runDir, "report.pdf"));
+    assert.equal(pdf.pages, 1);
+    const chart = chartText(squash(pdf.text), "en");
+    assert.ok(chart.includes(squash("100 = median of 2016-09 - 2017-08")), chart);
+    for (const label of ["2017-01", "2026-01", "uk", "cs", "pl", "en", "de", "fr"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
+  });
+
+  it("leaves not-assessed language editions off the chart", async () => {
+    const runDir = tempDir();
+    const result = analyzeLongPeriod(runDir, "Q1666254", "cs,uk,en,de,fr,pl", ["--user-question", "Where is intermittent fasting gaining attention?"]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(runCli("report", ["--run-dir", runDir], LONG_PERIOD).status, 0);
+
+    const pdf = await readPdf(join(runDir, "report.pdf"));
+    assert.equal(pdf.pages, 1);
+    const chart = chartText(squash(pdf.text), "en");
+    for (const lang of ["en", "de", "fr"]) assert.ok(chart.includes(lang), `${lang} in ${chart}`);
+    for (const lang of ["cs", "uk", "pl"]) assert.ok(!chart.includes(lang), `${lang} in ${chart}`);
+  });
+
+  it("refuses a report that does not fit on one page and says what to shorten", () => {
+    const runDir = analyze("en", "Is interest in astronomy growing? ".repeat(60));
+
+    const result = runCli("report", ["--run-dir", runDir], ASTRONOMY);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /^Error: the report does not fit on one page\. Shorten --user-question or --proxy-reason/);
+    assert.ok(!existsSync(join(runDir, "report.pdf")));
   });
 
   it("keeps the Ukrainian and English dictionaries on the same set of keys", () => {

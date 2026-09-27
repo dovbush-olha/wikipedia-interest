@@ -1,8 +1,10 @@
 import { join } from "node:path";
 import PDFDocument from "pdfkit";
 import type { Analysis, AssessedLanguage, NotAssessedLanguage } from "./analysis.ts";
+import { drawChart } from "./chart.ts";
 import { UserError } from "./cli.ts";
-import { HISTORY_CHECK_TRUNCATED, LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
+import { HISTORY_CHECK_TRUNCATED, indexedAttention, LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
+import { monthsOf } from "./period.ts";
 import { SKILL_DIR } from "./env.ts";
 import { STRINGS, type Strings } from "./strings.ts";
 
@@ -13,6 +15,8 @@ const MARGIN = 48;
 const INK = "#1a1a1a";
 const MUTED = "#666666";
 const RULE = "#bbbbbb";
+/** The least room between the content and the footer. */
+const FOOTER_GAP = 12;
 /** Width share of the language column, in the table and in the not-assessed group alike. */
 const LANGUAGE_SHARE = 0.145;
 
@@ -54,7 +58,14 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
   const notAssessed = analysis.languages.filter((language) => language.data_status === "insufficient_data");
   const languageName = languageNamer(analysis);
   if (assessed.length > 0) {
-    doc.moveDown(1.2);
+    // Only assessed languages have a baseline to index to; the others are named in their group under the table.
+    const series = assessed.map((language) => ({ lang: language.lang, values: indexedAttention(language.series) }));
+    const labels = { title: t.chartTitle, baseline: t.chartBaseline(analysis.growth_compares) };
+    const tick = new Intl.NumberFormat(analysis.report_lang, { maximumFractionDigits: 0 });
+    const ink = { text: INK, muted: MUTED, rule: RULE };
+    const top = doc.y + doc.currentLineHeight();
+    drawChart(doc, monthsOf(period), series, labels, ink, (value) => tick.format(value), { left: MARGIN, top, width });
+    doc.fontSize(10).moveDown(0.8);
     drawLanguageTable(doc, assessed, analysis, languageName, t, width);
     doc.moveDown(0.8).fillColor(MUTED).fontSize(8);
     for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), t.heuristicNote]) {
@@ -79,16 +90,18 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
     doc.moveDown(notAssessed.length > 0 ? 0.6 : 0).fillColor(MUTED).fontSize(8).text(historyNote, MARGIN, doc.y, { width });
   }
 
+  const contentBottom = doc.y;
   const footer = [[topic.qid, `${t.period}: ${periodText}`, `${t.generated} ${generatedOn}`].join("  ·  "), t.source].join("\n");
   doc.fontSize(8);
   const footerTop = doc.page.height - MARGIN - doc.heightOfString(footer, { width });
   doc.fillColor(MUTED).text(footer, MARGIN, footerTop, { width });
 
-  const pages = doc.bufferedPageRange().count;
+  // The footer sits at the foot of the page: content reaching into it does not fit either.
+  const fits = doc.bufferedPageRange().count === 1 && contentBottom + FOOTER_GAP <= footerTop;
   doc.end();
   await done;
-  if (pages > 1) {
-    throw new UserError(`the report needs ${pages} pages but must fit on one. Shorten --user-question or --proxy-reason and rerun analyze.ts.`);
+  if (!fits) {
+    throw new UserError("the report does not fit on one page. Shorten --user-question or --proxy-reason and rerun analyze.ts.");
   }
   return Buffer.concat(chunks);
 }
