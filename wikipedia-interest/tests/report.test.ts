@@ -52,6 +52,19 @@ describe("report", () => {
     assert.ok(text.includes(squash("Згенеровано 2026-09-15")), pdf.text);
   });
 
+  it("shows trend metrics and trend reliability per language, with the heuristic_v1 note under the table", async () => {
+    const runDir = analyze("uk", "Чи зростає інтерес до астрономії?");
+    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+
+    const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
+    // uk: relative attention, raw views and edition growth, months up of 12, trend and reliability.
+    for (const fact of ["-47,2%", "-63,0%", "-28,2%", "2 з 12", "спад", "висока"]) assert.ok(text.includes(squash(fact)), fact);
+    // pl: a recent spike lowers high to moderate, and the table says why.
+    assert.ok(text.includes(squash("помірна: сплеск 2025-11")), text);
+    assert.ok(text.includes(squash("медіана за 2025-09 - 2026-08 відносно медіани за 2024-09 - 2025-08")), text);
+    assert.ok(text.includes(squash("heuristic_v1 - проста продуктова евристика, а не статистична довіра чи ймовірність")), text);
+  });
+
   it("renders the same page in English", async () => {
     const question = "Is interest in astronomy growing in Ukrainian Wikipedia?";
     const runDir = analyze("en", question);
@@ -67,6 +80,8 @@ describe("report", () => {
     assert.ok(text.includes(squash("Views per million")), pdf.text);
     assert.ok(text.includes("7.91"), pdf.text);
     assert.ok(text.includes(squash("Generated 2026-09-15")), pdf.text);
+    for (const fact of ["-47.2%", "2 of 12", "down", "high", "moderate: spike 2025-11"]) assert.ok(text.includes(squash(fact)), fact);
+    assert.ok(text.includes(squash("heuristic_v1 is a simple product heuristic, not a statistical confidence or probability")), pdf.text);
   });
 
   it("keeps the Ukrainian and English dictionaries on the same set of keys", () => {

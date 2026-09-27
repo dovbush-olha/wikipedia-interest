@@ -76,6 +76,23 @@ describe("analyze --qid", () => {
     assert.equal(pl.views_per_million, EXPECTED_VIEWS_PER_MILLION.pl);
   });
 
+  it("returns trend metrics and trend reliability for every language, and names the compared months", () => {
+    const outDir = tempDir();
+    const result = analyzeAstronomy(outDir);
+    assert.equal(result.status, 0, result.stderr);
+
+    const out = JSON.parse(result.stdout);
+    assert.deepEqual(out.growth_compares, {
+      first_12_months: { start: "2024-09", end: "2025-08" },
+      last_12_months: { start: "2025-09", end: "2026-08" },
+    });
+    for (const [i, expected] of EXPECTED_TREND_METRICS.entries()) {
+      const { lang, title: _title, views_per_million: _views, ...metrics } = out.languages[i];
+      assert.deepEqual({ lang, ...metrics }, expected);
+    }
+    assert.deepEqual(analysisIn(outDir).growth_compares, out.growth_compares);
+  });
+
   it("produces a byte-for-byte identical analysis for the same input and fixtures", () => {
     const first = tempDir();
     const second = tempDir();
@@ -287,3 +304,43 @@ describe("analyze language limit", () => {
 const EXPECTED_UK_2026_08 = { month: "2026-08", article_views: 360, edition_views: 50720483, relative_attention: 7.098 };
 // Median of the 12 monthly values 2025-09..2026-08, rounded to 2 decimals.
 const EXPECTED_VIEWS_PER_MILLION = { uk: 7.91, cs: 8.72, pl: 6.1 };
+// Computed independently from the recorded responses for 2024-09..2026-08 (medians of 2024-09..2025-08 and 2025-09..2026-08).
+// uk spikes in 2024-09, before the last 12 months; pl spikes in 2025-11, inside them, which lowers high to moderate.
+const EXPECTED_TREND_METRICS = [
+  {
+    lang: "uk",
+    relative_attention_growth_pct: -47.2,
+    raw_growth_pct: -63,
+    edition_growth_pct: -28.2,
+    recent_trend_consistency: { positive_months: 2, months_compared: 12 },
+    trend: "down",
+    trend_reliability: "high",
+    reliability_method: "heuristic_v1",
+    reliability_reasons: ["direction_matches_in_10_of_12_recent_months"],
+    flags: ["spike:2024-09"],
+  },
+  {
+    lang: "cs",
+    relative_attention_growth_pct: -23.1,
+    raw_growth_pct: -34.6,
+    edition_growth_pct: -16.1,
+    recent_trend_consistency: { positive_months: 2, months_compared: 12 },
+    trend: "down",
+    trend_reliability: "high",
+    reliability_method: "heuristic_v1",
+    reliability_reasons: ["direction_matches_in_10_of_12_recent_months"],
+    flags: [],
+  },
+  {
+    lang: "pl",
+    relative_attention_growth_pct: -29.6,
+    raw_growth_pct: -36.8,
+    edition_growth_pct: -11.9,
+    recent_trend_consistency: { positive_months: 3, months_compared: 12 },
+    trend: "down",
+    trend_reliability: "moderate",
+    reliability_method: "heuristic_v1",
+    reliability_reasons: ["direction_matches_in_9_of_12_recent_months", "recent_spike:2025-11"],
+    flags: ["spike:2025-11"],
+  },
+];

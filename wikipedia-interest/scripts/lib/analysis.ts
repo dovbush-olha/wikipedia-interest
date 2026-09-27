@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { UserError } from "./cli.ts";
+import type { GrowthCompares, LanguageMetrics } from "./metrics.ts";
 import type { Period } from "./period.ts";
 
 // The analysis result: written by analyze.ts to analysis.json, read by report.ts.
@@ -29,12 +30,7 @@ export type MonthPoint = {
   relative_attention: number | null;
 };
 
-export type LanguageResult = {
-  lang: string;
-  title: string;
-  views_per_million: number | null;
-  series: MonthPoint[];
-};
+export type LanguageResult = { lang: string; title: string } & LanguageMetrics;
 
 export type Analysis = {
   status: "ok";
@@ -44,6 +40,8 @@ export type Analysis = {
   as_of: string;
   measured_topic: MeasuredTopic;
   period: Period;
+  /** The months every growth in `languages` compares. */
+  growth_compares: GrowthCompares;
   languages: LanguageResult[];
 };
 
