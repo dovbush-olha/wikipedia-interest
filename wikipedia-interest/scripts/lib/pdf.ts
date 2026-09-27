@@ -57,21 +57,26 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
     doc.moveDown(1.2);
     drawLanguageTable(doc, assessed, analysis, languageName, t, width);
     doc.moveDown(0.8).fillColor(MUTED).fontSize(8);
-    const history = t.historyNote(
-      assessed.map((language) => ({
-        lang: language.lang,
-        titles: language.historical_titles,
-        checked: language.redirect_candidates_checked,
-        truncated: language.flags.includes(HISTORY_CHECK_TRUNCATED),
-      })),
-    );
-    for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), history, t.heuristicNote]) {
+    for (const note of [t.viewsPerMillionNote, t.growthNote(analysis.growth_compares), t.heuristicNote]) {
       doc.text(note, MARGIN, doc.y, { width }).moveDown(0.4);
     }
   }
   if (notAssessed.length > 0) {
     doc.moveDown(assessed.length > 0 ? 0.8 : 1.2);
     drawNotAssessed(doc, notAssessed, analysis, languageName, t, width);
+  }
+  // Every article's history check, assessed or not: a missed historical title can also be why a history looks short.
+  const articles = analysis.languages.filter((language) => language.title !== null);
+  if (articles.length > 0) {
+    const historyNote = t.historyNote(
+      articles.map((language) => ({
+        lang: language.lang,
+        titles: language.historical_titles,
+        checked: language.redirect_candidates_checked,
+        truncated: language.flags.includes(HISTORY_CHECK_TRUNCATED),
+      })),
+    );
+    doc.moveDown(notAssessed.length > 0 ? 0.6 : 0).fillColor(MUTED).fontSize(8).text(historyNote, MARGIN, doc.y, { width });
   }
 
   const footer = [[topic.qid, `${t.period}: ${periodText}`, `${t.generated} ${generatedOn}`].join("  ·  "), t.source].join("\n");

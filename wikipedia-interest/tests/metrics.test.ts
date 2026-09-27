@@ -156,7 +156,7 @@ describe("trend reliability, heuristic_v1", () => {
   });
 });
 
-/** Some of the article's redirects were not checked for former titles. */
+/** Some of the article's redirects were not checked for historical titles. */
 const TRUNCATED: HistoryCheck = { truncated: true };
 
 describe("trend reliability downgrades", () => {
@@ -382,6 +382,7 @@ describe("insufficient data", () => {
       max_months_available: 22,
       trend: null,
       trend_reliability: null,
+      flags: [],
     });
   });
 
@@ -395,6 +396,7 @@ describe("insufficient data", () => {
       max_months_available: 6,
       trend: null,
       trend_reliability: null,
+      flags: [],
     });
   });
 
@@ -407,6 +409,7 @@ describe("insufficient data", () => {
       max_months_available: 0,
       trend: null,
       trend_reliability: null,
+      flags: [],
     });
   });
 
@@ -419,7 +422,22 @@ describe("insufficient data", () => {
       reason: "zero_baseline",
       trend: null,
       trend_reliability: null,
+      flags: [],
     });
+  });
+
+  it("flags a truncated history check on short_history, since a missed historical title may hold the earlier views", () => {
+    const metrics = languageMetrics(MONTHS_24, views("2024-09", [null, null, ...flat(22, 100)]), EDITION_24, TRUNCATED);
+
+    assert.equal(metrics.data_status, "insufficient_data");
+    assert.deepEqual(metrics.flags, ["history_check_truncated"]);
+  });
+
+  it("flags a truncated history check on zero_baseline", () => {
+    const metrics = languageMetrics(MONTHS_24, views("2024-09", [...flat(12, 0), ...flat(12, 500)]), EDITION_24, TRUNCATED);
+
+    assert.equal(metrics.data_status, "insufficient_data");
+    assert.deepEqual(metrics.flags, ["history_check_truncated"]);
   });
 
   it("is assessed at a first-year median just above zero", () => {

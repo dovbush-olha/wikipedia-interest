@@ -15,7 +15,7 @@ import type { MonthRange } from "./period.ts";
 
 const range = ({ start, end }: MonthRange) => `${start} - ${end}`;
 
-/** The history check of one assessed language: its historical titles among the redirects checked. */
+/** The history check of one article: its historical titles among the redirect candidates checked. */
 export type HistoryCheckLine = { lang: string; titles: string[]; checked: number; truncated: boolean };
 
 const en = {
@@ -56,8 +56,8 @@ const en = {
       ...lines.map(({ lang, titles, checked, truncated }) => {
         const found = titles.length === 0 ? "no historical titles" : `historical titles ${titles.map((title) => `“${title}”`).join(", ")}`;
         const check = truncated
-          ? `only the first ${checked} redirects checked, so historical titles may be missing`
-          : `${checked} ${checked === 1 ? "redirect" : "redirects"} checked`;
+          ? `only the first ${checked} redirect candidates checked, so historical titles may be missing`
+          : `${checked} ${checked === 1 ? "redirect candidate" : "redirect candidates"} checked`;
         return `${lang}: ${found}; ${check}.`;
       }),
     ].join(" "),
@@ -124,8 +124,8 @@ const uk: Strings = {
       ...lines.map(({ lang, titles, checked, truncated }) => {
         const found = titles.length === 0 ? "історичних назв немає" : `історичні назви ${titles.map((title) => `«${title}»`).join(", ")}`;
         const check = truncated
-          ? `перевірено лише перші ${checked} редиректів, тож історичні назви могли бути пропущені`
-          : `перевірено редиректів: ${checked}`;
+          ? `перевірено лише перших ${checked} кандидатів на історичну назву, тож історичні назви могли бути пропущені`
+          : `перевірено кандидатів на історичну назву: ${checked}`;
         return `${lang}: ${found}; ${check}.`;
       }),
     ].join(" "),

@@ -96,7 +96,7 @@ describe("analyze --qid", () => {
       last_12_months: { start: "2025-09", end: "2026-08" },
     });
     for (const [i, expected] of EXPECTED_TREND_METRICS.entries()) {
-      const { lang, title: _title, historical_titles: _former, redirect_candidates_checked: _checked, views_per_million: _views, ...metrics } =
+      const { lang, title: _title, historical_titles: _historical, redirect_candidates_checked: _checked, views_per_million: _views, ...metrics } =
         out.languages[i];
       assert.deepEqual({ lang, ...metrics }, expected);
     }
@@ -182,6 +182,7 @@ describe("analyze insufficient data", () => {
       max_months_available: 17,
       trend: null,
       trend_reliability: null,
+      flags: [],
     });
     // Not silently analyzed over a shorter period: no series and no metrics.
     assert.deepEqual(analysisIn(outDir).languages[2], xh);
@@ -238,7 +239,7 @@ describe("analyze article history", () => {
     assert.equal(eu.redirect_candidates_checked, 1);
     assert.equal(eu.data_status, "ok");
     const { views } = onlyLanguage(outDir);
-    // Recorded views of the current + the former title: before the rename, after it, and at the end of the period.
+    // Recorded views of the current + the historical title: before the rename, after it, and at the end of the period.
     assert.equal(views.get("2024-09"), 0 + 3);
     assert.equal(views.get("2025-12"), 3 + 1);
     assert.equal(views.get("2026-08"), 2 + 1);

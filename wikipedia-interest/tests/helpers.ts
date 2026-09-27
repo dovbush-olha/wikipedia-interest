@@ -83,7 +83,7 @@ export function analyzeFasting(
   );
 }
 
-// Former titles, recorded on 2026-09-27 for the period 2024-09..2026-08 with a fixed "today" of 2026-09-15:
+// Historical titles, recorded on 2026-09-27 for the period 2024-09..2026-08 with a fixed "today" of 2026-09-15:
 // - Q9357655 (Таня Малярчук) in uk, in both report languages: renamed from "Малярчук Тетяна Володимирівна" to "Малярчук Таня"
 //   and then to "Таня Малярчук" on 2025-02-01; its other two redirects are synonyms with no move logged.
 // - Q634 (planet) in uk: its redirect "Планети" was the title of another page, the Holst suite, until that page moved away

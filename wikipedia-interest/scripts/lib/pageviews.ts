@@ -1,5 +1,5 @@
 import { UserError } from "./cli.ts";
-import { getJson } from "./http.ts";
+import { CONCURRENT_REQUESTS, getJson, mapLimited } from "./http.ts";
 import { lastDayOf, monthsOf, type Period } from "./period.ts";
 
 // Only human traffic on every platform: bots and crawlers would inflate the signal.
@@ -44,10 +44,10 @@ export async function editionViews(lang: string, period: Period): Promise<Monthl
   );
 }
 
-/** Human views of an article under all its `titles`, current and former, summed per month. */
+/** Human views of an article under all its `titles`, current and historical, summed per month. */
 export async function articleViews(lang: string, titles: string[], period: Period): Promise<MonthlyViews> {
   const total: MonthlyViews = new Map();
-  for (const views of await Promise.all(titles.map((title) => titleViews(lang, title, period)))) {
+  for (const views of await mapLimited(titles, CONCURRENT_REQUESTS, (title) => titleViews(lang, title, period))) {
     for (const [month, count] of views) total.set(month, (total.get(month) ?? 0) + count);
   }
   return total;

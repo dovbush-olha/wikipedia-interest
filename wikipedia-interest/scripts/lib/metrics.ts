@@ -63,21 +63,23 @@ export type AssessedMetrics = {
  */
 type Insufficient<Reason> = { data_status: "insufficient_data" } & Reason & { trend: null; trend_reliability: null };
 export type NoLinkedArticle = Insufficient<{ reason: "no_linked_article" }>;
-/** A linked article whose views cannot assess the topic. */
-export type InsufficientHistory = Insufficient<{ reason: "short_history"; max_months_available: number } | { reason: "zero_baseline" }>;
+/** A linked article whose views cannot assess the topic; `flags` says when a truncated history check may be why. */
+export type InsufficientHistory = Insufficient<{ reason: "short_history"; max_months_available: number } | { reason: "zero_baseline" }> & {
+  flags: string[];
+};
 export type InsufficientData = NoLinkedArticle | InsufficientHistory;
 
 export type LanguageMetrics = AssessedMetrics | InsufficientHistory;
 
 export type GrowthCompares = { first_12_months: MonthRange; last_12_months: MonthRange };
 
-/** How completely the article's redirects were checked for former titles: `truncated` when some were not. */
+/** How completely the article's redirects were checked for historical titles: `truncated` when some were not. */
 export type HistoryCheck = { truncated: boolean };
 
 /**
  * Every metric of one language edition over the requested `months`, from its article and edition views;
  * insufficient_data when they cannot assess the topic over the whole period.
- * A truncated `history` check may have missed former titles, and so views of the article.
+ * A truncated `history` check may have missed historical titles, and so views of the article.
  */
 export function languageMetrics(
   months: string[],
@@ -85,10 +87,12 @@ export function languageMetrics(
   edition: MonthlyViews,
   history: HistoryCheck = { truncated: false },
 ): LanguageMetrics {
+  const historyFlags = history.truncated ? [HISTORY_CHECK_TRUNCATED] : [];
   // Months before the article's first month with data are missing (it did not exist yet), not zero views.
   const first = months.findIndex((month) => article.has(month));
   if (first !== 0) {
-    return insufficientData({ reason: "short_history", max_months_available: first === -1 ? 0 : months.length - first });
+    const available = first === -1 ? 0 : months.length - first;
+    return { ...insufficientData({ reason: "short_history", max_months_available: available }), flags: historyFlags };
   }
   const series = relativeAttentionSeries(months, article, edition);
   const raw = series.map((point) => point.article_views);
@@ -97,7 +101,7 @@ export function languageMetrics(
   // Edition views are never zero, so a zero relative attention baseline is also a zero raw views baseline.
   const relativeGrowth = growthPct(relative);
   const rawGrowth = growthPct(raw);
-  if (relativeGrowth === null || rawGrowth === null) return insufficientData({ reason: "zero_baseline" });
+  if (relativeGrowth === null || rawGrowth === null) return { ...insufficientData({ reason: "zero_baseline" }), flags: historyFlags };
   // Decided on the rounded growth, so the reported number and the trend never disagree.
   const trend = trendOf(relativeGrowth);
   const changes = yearOverYear(relative);
@@ -121,7 +125,7 @@ export function languageMetrics(
       ...spikes.map((month) => `spike:${month}`),
       ...(lowVolume ? [LOW_VOLUME] : []),
       ...(diverge ? ["raw_relative_diverge"] : []),
-      ...(history.truncated ? [HISTORY_CHECK_TRUNCATED] : []),
+      ...historyFlags,
     ],
   };
 }

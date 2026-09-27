@@ -180,6 +180,9 @@ describe("report", () => {
     assert.equal(pdf.pages, 1);
     const { table, notAssessed } = splitAtNotAssessed(squash(pdf.text), "Not assessed");
     assert.ok(notAssessed.includes(squash("pl - Polish")) && notAssessed.includes(squash("xh - Xhosa")), notAssessed);
+    // The history check of a not-assessed article is shown too; pl has no article to check.
+    assert.ok(notAssessed.includes(squash("xh: no historical titles; 0 redirect candidates checked.")), notAssessed);
+    assert.ok(!notAssessed.includes(squash("pl: no historical titles")), notAssessed);
     assert.ok(!table.includes(squash(STRINGS.en.columnViewsPerMillion)), table);
   });
 
@@ -192,7 +195,7 @@ describe("report", () => {
     assert.equal(pdf.pages, 1);
     const text = squash(pdf.text);
     assert.ok(text.includes(squash("Перегляди статті включають її історичні назви, підтверджені журналом перейменувань")), pdf.text);
-    assert.ok(text.includes(squash("uk: історичні назви «Малярчук Тетяна Володимирівна», «Малярчук Таня»; перевірено редиректів: 4.")), pdf.text);
+    assert.ok(text.includes(squash("uk: історичні назви «Малярчук Тетяна Володимирівна», «Малярчук Таня»; перевірено кандидатів на історичну назву: 4.")), pdf.text);
   });
 
   it("says when a language has no historical titles, and how many redirects were checked (en)", async () => {
@@ -201,7 +204,11 @@ describe("report", () => {
 
     const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
     assert.ok(text.includes(squash("Article views include its historical titles confirmed by the move log; other redirects are not counted.")), text);
-    for (const checked of ["uk: no historical titles; 1 redirect checked.", "cs: no historical titles; 3 redirects checked.", "pl: no historical titles; 0 redirects checked."]) {
+    for (const checked of [
+      "uk: no historical titles; 1 redirect candidate checked.",
+      "cs: no historical titles; 3 redirect candidates checked.",
+      "pl: no historical titles; 0 redirect candidates checked.",
+    ]) {
       assert.ok(text.includes(squash(checked)), `${checked} in ${text}`);
     }
   });
@@ -216,7 +223,7 @@ describe("report", () => {
     const text = squash(pdf.text);
     assert.ok(text.includes(squash("moderate: history check truncated")), pdf.text);
     assert.ok(
-      text.includes(squash("en: no historical titles; only the first 50 redirects checked, so historical titles may be missing.")),
+      text.includes(squash("en: no historical titles; only the first 50 redirect candidates checked, so historical titles may be missing.")),
       pdf.text,
     );
   });
