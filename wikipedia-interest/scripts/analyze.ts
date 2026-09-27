@@ -7,16 +7,30 @@ import { isInsideSkillDir, SKILL_DIR, today } from "./lib/env.ts";
 import { growthCompares, insufficientData, languageMetrics } from "./lib/metrics.ts";
 import { articleViews, editionViews } from "./lib/pageviews.ts";
 import { monthsOf, requestedPeriod, type Period } from "./lib/period.ts";
-import { resolveQid } from "./lib/resolve.ts";
+import { resolveQid, resolveTopic, type TopicMatch } from "./lib/resolve.ts";
 
 const USAGE =
-  'node analyze.ts --qid <Q...> --langs <codes> --user-question "<question>" [--report-lang uk|en] ' +
-  "[--start YYYY-MM | --months N] [--end YYYY-MM] --out-dir <path>";
+  'node analyze.ts (--topic "<text>" [--topic-lang <code>] | --qid <Q...>) --langs <codes> --user-question "<question>" ' +
+  '[--proxy-reason "<reason>"] [--report-lang uk|en] [--start YYYY-MM | --months N] [--end YYYY-MM] --out-dir <path>';
+
+const DEFAULT_TOPIC_LANG = "en";
+const LANG_CODE = /^[a-z]{2,3}(-[a-z0-9]+)*$/;
+
+const NEEDS_CHOICE_NEXT_STEP =
+  "Pick the candidate whose meaning matches the user's question; coverage comes second, and its missing_langs will not be assessed. " +
+  "Rerun the same command with --qid <qid> in place of --topic and --topic-lang, and add --proxy-reason \"<how it differs>\" " +
+  "if the candidate is broader or narrower than the topic of the question. " +
+  "If no candidate is both close in meaning and covered in enough of the requested languages, tell the user instead of measuring another topic.";
+
+type TopicSource = { kind: "qid"; qid: string } | { kind: "topic"; query: string; topicLang: string };
 
 await runMain(async () => {
   const args = parseCliArgs(
     {
+      topic: { type: "string" },
+      "topic-lang": { type: "string" },
       qid: { type: "string" },
+      "proxy-reason": { type: "string" },
       langs: { type: "string" },
       "user-question": { type: "string" },
       "report-lang": { type: "string", default: "en" },
@@ -36,9 +50,13 @@ await runMain(async () => {
         "The report shows it next to the measured topic.",
     );
   }
-  const qid = args.qid?.trim().toUpperCase();
-  if (!qid || !/^Q[1-9]\d*$/.test(qid)) {
-    throw new UserError(`--qid must be a Wikidata item ID like Q333, got ${JSON.stringify(args.qid ?? "")}.\nUsage: ${USAGE}`);
+  const source = parseTopicSource(args.topic, args["topic-lang"], args.qid);
+  const proxyReason = args["proxy-reason"]?.trim();
+  if (proxyReason === "") {
+    throw new UserError(
+      "--proxy-reason is empty: say briefly how the measured topic differs from the topic of the question, " +
+        "or leave --proxy-reason out when the measured topic is the topic of the question.",
+    );
   }
   const langs = parseLangs(args.langs);
   const reportLang = args["report-lang"] as ReportLang;
@@ -53,7 +71,36 @@ await runMain(async () => {
 
   const asOf = today();
   const period = requestedPeriod({ start: args.start, end: args.end, months: args.months }, asOf);
+  let qid: string;
+  let topicMatch: TopicMatch | null = null;
+  if (source.kind === "qid") {
+    qid = source.qid;
+  } else {
+    const { query, topicLang } = source;
+    const resolution = await resolveTopic(query, topicLang, langs, reportLang);
+    if (resolution.status === "needs_choice") {
+      printJson({
+        status: resolution.status,
+        query,
+        topic_lang: topicLang,
+        reason: resolution.reason,
+        candidates: resolution.candidates,
+        next_step: NEEDS_CHOICE_NEXT_STEP,
+      });
+      return;
+    }
+    if (resolution.status === "not_found") {
+      printJson({ status: resolution.status, query, topic_lang: topicLang, next_step: notFoundNextStep(query, topicLang) });
+      return;
+    }
+    qid = resolution.qid;
+    topicMatch = resolution.match;
+  }
+
   const { topic, titles } = await resolveQid(qid, langs, reportLang);
+  const relation = proxyReason === undefined
+    ? { relation_to_question: "direct" as const, proxy_reason: null }
+    : { relation_to_question: "proxy" as const, proxy_reason: proxyReason };
   const languages = await allInOrder(langs.map((lang) => analyzeLanguage(lang, titles.get(lang) ?? null, period)));
 
   const analysis: Analysis = {
@@ -61,7 +108,8 @@ await runMain(async () => {
     user_question: userQuestion,
     report_lang: reportLang,
     as_of: asOf,
-    measured_topic: topic,
+    measured_topic: { ...topic, ...relation },
+    topic_match: topicMatch,
     period,
     growth_compares: growthCompares(period),
     languages,
@@ -77,6 +125,45 @@ await runMain(async () => {
     next_step: `Run: node ${join(SKILL_DIR, "scripts", "report.ts")} --run-dir ${outDir}`,
   });
 });
+
+function notFoundNextStep(query: string, topicLang: string): string {
+  return (
+    `No article in ${topicLang}.wikipedia matches ${JSON.stringify(query)}. ` +
+    "Rephrase the topic, e.g. as the likely article title or a shorter phrase, " +
+    "or pass --topic-lang with the language the topic is written in, and rerun."
+  );
+}
+
+function parseTopicSource(topic: string | undefined, topicLang: string | undefined, qidArg: string | undefined): TopicSource {
+  if (topic !== undefined && qidArg !== undefined) {
+    throw new UserError("--topic and --qid cannot be used together: pass --qid once the topic is chosen, otherwise --topic.");
+  }
+  if (qidArg !== undefined) {
+    if (topicLang !== undefined) {
+      throw new UserError("--topic-lang applies only to --topic, the language its text is written in. Leave it out with --qid.");
+    }
+    const qid = qidArg.trim().toUpperCase();
+    if (!/^Q[1-9]\d*$/.test(qid)) {
+      throw new UserError(`--qid must be a Wikidata item ID like Q333, got ${JSON.stringify(qidArg)}.\nUsage: ${USAGE}`);
+    }
+    return { kind: "qid", qid };
+  }
+  if (topic === undefined) {
+    throw new UserError(
+      'pass the topic as --topic "<text>" or, once chosen, as --qid <Q...>, ' +
+        'e.g. --topic "intermittent fasting" --topic-lang en.\nUsage: ' + USAGE,
+    );
+  }
+  const query = topic.trim().replace(/\s+/g, " ");
+  if (query === "") throw new UserError('--topic is empty: pass the topic in a few words, e.g. --topic "intermittent fasting".');
+  const lang = (topicLang ?? DEFAULT_TOPIC_LANG).trim().toLowerCase();
+  if (!LANG_CODE.test(lang)) {
+    throw new UserError(
+      `--topic-lang must be a Wikipedia language code, the language --topic is written in, e.g. en or uk; got ${JSON.stringify(topicLang)}.`,
+    );
+  }
+  return { kind: "topic", query, topicLang: lang };
+}
 
 async function analyzeLanguage(lang: string, title: string | null, period: Period): Promise<LanguageResult> {
   // Edition first: it fails while the --end month is unpublished, before the article's incomplete views get cached for good.
@@ -110,7 +197,7 @@ function parseLangs(value: string | undefined): string[] {
   if (langs.length === 0) {
     throw new UserError(`--langs is required: comma-separated Wikipedia language codes, e.g. --langs uk,pl,cs.`);
   }
-  const invalid = langs.filter((lang) => !/^[a-z]{2,3}(-[a-z0-9]+)*$/.test(lang));
+  const invalid = langs.filter((lang) => !LANG_CODE.test(lang));
   if (invalid.length > 0) {
     throw new UserError(`--langs has invalid language codes: ${invalid.join(", ")}. Use Wikipedia codes such as uk, pl, cs.`);
   }

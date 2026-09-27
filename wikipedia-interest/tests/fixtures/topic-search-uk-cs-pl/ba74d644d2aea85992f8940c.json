@@ -1,0 +1,27 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&titles=Stellar+astronomy&redirects=1&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "redirects": [
+        {
+          "from": "Stellar astronomy",
+          "to": "Astronomy",
+          "tofragment": "Stellar"
+        }
+      ],
+      "pages": [
+        {
+          "pageid": 50650,
+          "ns": 0,
+          "title": "Astronomy",
+          "pageprops": {
+            "wikibase_item": "Q333"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T08:57:37.056Z"
+}

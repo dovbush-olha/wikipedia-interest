@@ -1,0 +1,26 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&titles=Periodic+fasting&redirects=1&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "redirects": [
+        {
+          "from": "Periodic fasting",
+          "to": "Intermittent fasting"
+        }
+      ],
+      "pages": [
+        {
+          "pageid": 20104879,
+          "ns": 0,
+          "title": "Intermittent fasting",
+          "pageprops": {
+            "wikibase_item": "Q1666254"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T08:57:32.848Z"
+}

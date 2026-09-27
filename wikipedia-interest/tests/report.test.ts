@@ -91,6 +91,46 @@ describe("report", () => {
     assert.ok(text.includes(squash("heuristic_v1 is a simple product heuristic, not a statistical confidence or probability")), pdf.text);
   });
 
+  const proxyCases = [
+    {
+      reportLang: "uk",
+      question: "Чи зростає інтерес до аматорської астрономії?",
+      reason: "Статті про аматорську астрономію немає в усіх мовах; астрономія ширша за неї.",
+      assumption: "Припущення: виміряна тема - проксі теми питання, вона може бути ширшою або вужчою за тему питання.",
+    },
+    {
+      reportLang: "en",
+      question: "Is interest in amateur astronomy growing?",
+      reason: "Amateur astronomy has no article in every language; astronomy is broader.",
+      assumption: "Assumption: the measured topic is a proxy for the topic of the question; it may be broader or narrower than that topic.",
+    },
+  ] as const;
+  for (const c of proxyCases) {
+    it(`states the proxy as an explicit assumption with its reason, after the question and the measured topic (${c.reportLang})`, async () => {
+      const runDir = tempDir();
+      const result = analyzeAstronomy(runDir, c.question, { reportLang: c.reportLang, extraArgs: ["--proxy-reason", c.reason] });
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+
+      const pdf = await readPdf(join(runDir, "report.pdf"));
+      assert.equal(pdf.pages, 1);
+      const text = squash(pdf.text);
+      const question = text.indexOf(squash(c.question));
+      const topic = text.indexOf(squash("(Q333)"));
+      const assumption = text.indexOf(squash(`${c.assumption} ${c.reason}`));
+      assert.ok(question !== -1 && question < topic && topic < assumption, pdf.text);
+    });
+  }
+
+  it("states no assumption for a direct measured topic", async () => {
+    const runDir = analyze("uk", "Чи зростає інтерес до астрономії?");
+    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+
+    const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
+    assert.ok(!text.includes(squash("Припущення")), text);
+    assert.ok(!text.includes(squash("проксі")), text);
+  });
+
   const notAssessedCases = [
     {
       reportLang: "uk",

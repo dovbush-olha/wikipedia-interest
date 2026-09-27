@@ -1,0 +1,107 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q130192%7CQ2876734%7CQ2731224%7CQ200183%7CQ1468309&props=descriptions%7Csitelinks&languages=uk%7Cen&sitefilter=ukwiki%7Ccswiki%7Cplwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q130192": {
+        "type": "item",
+        "id": "Q130192",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "use of English by speakers with different native languages"
+          }
+        },
+        "sitelinks": {}
+      },
+      "Q2876734": {
+        "type": "item",
+        "id": "Q2876734",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "department of the BBC World Service devoted to English language teaching"
+          }
+        },
+        "sitelinks": {}
+      },
+      "Q2731224": {
+        "type": "item",
+        "id": "Q2731224",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "simplified English in Voice of America"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Speciální angličtina",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "VOA Special English",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Спрощена англійська",
+            "badges": []
+          }
+        }
+      },
+      "Q200183": {
+        "type": "item",
+        "id": "Q200183",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "Basic/Special English edition of Wikipedia"
+          },
+          "uk": {
+            "language": "uk",
+            "value": "розділ Вікіпедії, створений для читачів, яким важко розуміти англійську Вікіпедію"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Wikipedie ve zjednodušené angličtině",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Wikipedia w języku Simple English",
+            "badges": []
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Вікіпедія спрощеною англійською мовою",
+            "badges": []
+          }
+        }
+      },
+      "Q1468309": {
+        "type": "item",
+        "id": "Q1468309",
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "1991 compilation album by Die Toten Hosen"
+          }
+        },
+        "sitelinks": {
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Learning English, Lesson One",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T08:57:35.498Z"
+}

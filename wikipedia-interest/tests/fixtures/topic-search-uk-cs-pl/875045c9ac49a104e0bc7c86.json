@@ -1,0 +1,106 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&generator=search&gsrsearch=Stellar+astronomy&gsrnamespace=0&gsrlimit=10&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "continue": {
+      "gsroffset": 10,
+      "continue": "gsroffset||"
+    },
+    "query": {
+      "pages": [
+        {
+          "pageid": 7839,
+          "ns": 0,
+          "title": "Stellar corona",
+          "index": 7,
+          "pageprops": {
+            "wikibase_item": "Q113000019"
+          }
+        },
+        {
+          "pageid": 26808,
+          "ns": 0,
+          "title": "Star",
+          "index": 2,
+          "pageprops": {
+            "wikibase_item": "Q523"
+          }
+        },
+        {
+          "pageid": 28927,
+          "ns": 0,
+          "title": "Stellar classification",
+          "index": 10,
+          "pageprops": {
+            "wikibase_item": "Q25377588"
+          }
+        },
+        {
+          "pageid": 44790,
+          "ns": 0,
+          "title": "Luminosity",
+          "index": 6,
+          "pageprops": {
+            "wikibase_item": "Q105902"
+          }
+        },
+        {
+          "pageid": 50650,
+          "ns": 0,
+          "title": "Astronomy",
+          "index": 1,
+          "pageprops": {
+            "wikibase_item": "Q333"
+          }
+        },
+        {
+          "pageid": 58932,
+          "ns": 0,
+          "title": "Timeline of stellar astronomy",
+          "index": 4,
+          "pageprops": {
+            "wikibase_item": "Q986134"
+          }
+        },
+        {
+          "pageid": 183934,
+          "ns": 0,
+          "title": "Stellar wind",
+          "index": 8,
+          "pageprops": {
+            "wikibase_item": "Q654396"
+          }
+        },
+        {
+          "pageid": 202661,
+          "ns": 0,
+          "title": "Stellar parallax",
+          "index": 5,
+          "pageprops": {
+            "wikibase_item": "Q906561"
+          }
+        },
+        {
+          "pageid": 361897,
+          "ns": 0,
+          "title": "Astrophysics",
+          "index": 3,
+          "pageprops": {
+            "wikibase_item": "Q37547"
+          }
+        },
+        {
+          "pageid": 20310362,
+          "ns": 0,
+          "title": "Stellar kinematics",
+          "index": 9,
+          "pageprops": {
+            "wikibase_item": "Q6440"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T08:57:37.511Z"
+}

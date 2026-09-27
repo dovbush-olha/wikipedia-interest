@@ -1,0 +1,107 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&generator=search&gsrsearch=learning+English&gsrnamespace=0&gsrlimit=10&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "continue": {
+      "gsroffset": 10,
+      "continue": "gsroffset||"
+    },
+    "query": {
+      "pages": [
+        {
+          "pageid": 4934,
+          "ns": 0,
+          "title": "Basic English",
+          "index": 10,
+          "pageprops": {
+            "wikibase_item": "Q26746"
+          }
+        },
+        {
+          "pageid": 233488,
+          "ns": 0,
+          "title": "Machine learning",
+          "index": 7,
+          "pageprops": {
+            "wikibase_item": "Q2539"
+          }
+        },
+        {
+          "pageid": 252090,
+          "ns": 0,
+          "title": "Learning English (version of English)",
+          "index": 4,
+          "pageprops": {
+            "wikibase_item": "Q2731224"
+          }
+        },
+        {
+          "pageid": 407869,
+          "ns": 0,
+          "title": "Simple English Wikipedia",
+          "index": 5,
+          "pageprops": {
+            "wikibase_item": "Q200183"
+          }
+        },
+        {
+          "pageid": 415406,
+          "ns": 0,
+          "title": "English as a second or foreign language",
+          "index": 2,
+          "pageprops": {
+            "wikibase_item": "Q130192"
+          }
+        },
+        {
+          "pageid": 8738170,
+          "ns": 0,
+          "title": "English-medium education",
+          "index": 9,
+          "pageprops": {
+            "wikibase_item": "Q94906"
+          }
+        },
+        {
+          "pageid": 11178098,
+          "ns": 0,
+          "title": "BBC Learning English",
+          "index": 3,
+          "pageprops": {
+            "wikibase_item": "Q2876734"
+          }
+        },
+        {
+          "pageid": 21331275,
+          "ns": 0,
+          "title": "Learning English, Lesson One",
+          "index": 6,
+          "pageprops": {
+            "wikibase_item": "Q1468309"
+          }
+        },
+        {
+          "pageid": 21331306,
+          "ns": 0,
+          "title": "Learning English",
+          "index": 1,
+          "pageprops": {
+            "disambiguation": "",
+            "wikibase_item": "Q16871974"
+          }
+        },
+        {
+          "pageid": 24221898,
+          "ns": 0,
+          "title": "English language in the Netherlands",
+          "index": 8,
+          "pageprops": {
+            "wikibase_item": "Q1875673"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T08:57:35.132Z"
+}

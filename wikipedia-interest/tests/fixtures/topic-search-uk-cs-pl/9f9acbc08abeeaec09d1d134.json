@@ -1,0 +1,21 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&generator=search&gsrsearch=%22alternate-day+fasting%22+%22periodic+fasting%22+%225%3A2+diet%22&gsrnamespace=0&gsrlimit=10&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 20104879,
+          "ns": 0,
+          "title": "Intermittent fasting",
+          "index": 1,
+          "pageprops": {
+            "wikibase_item": "Q1666254"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T08:57:36.231Z"
+}

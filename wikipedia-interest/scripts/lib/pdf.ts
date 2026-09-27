@@ -44,6 +44,10 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
   const description = topic.description === null ? "" : ` - ${topic.description}`;
   doc.moveDown(0.3);
   labelled(doc, t.measuredTopic, `${topic.label} (${topic.qid})${description}`, width);
+  if (topic.relation_to_question === "proxy") {
+    doc.moveDown(0.3);
+    labelled(doc, t.assumption, `${t.proxyAssumption} ${topic.proxy_reason}`, width);
+  }
 
   // Languages with insufficient data are never ranked with the assessed ones: they get a group of their own.
   const assessed = analysis.languages.filter((language) => language.data_status === "ok");
@@ -71,7 +75,7 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
   doc.end();
   await done;
   if (pages > 1) {
-    throw new UserError(`the report needs ${pages} pages but must fit on one. Shorten --user-question and rerun analyze.ts.`);
+    throw new UserError(`the report needs ${pages} pages but must fit on one. Shorten --user-question or --proxy-reason and rerun analyze.ts.`);
   }
   return Buffer.concat(chunks);
 }
