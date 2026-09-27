@@ -1,0 +1,33 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q9357655&props=labels%7Cdescriptions%7Csitelinks&languages=en&sitefilter=ukwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q9357655": {
+        "type": "item",
+        "id": "Q9357655",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "Tania Maliarchuk"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "Ukrainian writer (born 1983)"
+          }
+        },
+        "sitelinks": {
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Таня Малярчук",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T09:45:29.785Z"
+}

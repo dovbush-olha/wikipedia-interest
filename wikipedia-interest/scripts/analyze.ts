@@ -5,6 +5,7 @@ import { ANALYSIS_FILE, MAX_LANGUAGES, REPORT_LANGS, type Analysis, type Languag
 import { parseCliArgs, printJson, runMain, UserError } from "./lib/cli.ts";
 import { isInsideSkillDir, SKILL_DIR, today } from "./lib/env.ts";
 import { growthCompares, insufficientData, languageMetrics } from "./lib/metrics.ts";
+import { articleHistory } from "./lib/history.ts";
 import { articleViews, editionViews } from "./lib/pageviews.ts";
 import { monthsOf, requestedPeriod, type Period } from "./lib/period.ts";
 import { resolveQid, resolveTopic, type TopicMatch } from "./lib/resolve.ts";
@@ -170,8 +171,15 @@ async function analyzeLanguage(lang: string, title: string | null, period: Perio
   // Also without a linked article, so a mistyped language code fails instead of reading as "no linked article".
   const edition = await editionViews(lang, period);
   if (title === null) return { lang, title, ...insufficientData({ reason: "no_linked_article" }) };
-  const article = await articleViews(lang, title, period);
-  return { lang, title, ...languageMetrics(monthsOf(period), article, edition) };
+  const { historical_titles, redirect_candidates_checked, truncated } = await articleHistory(lang, title);
+  const article = await articleViews(lang, [title, ...historical_titles], period);
+  return {
+    lang,
+    title,
+    historical_titles,
+    redirect_candidates_checked,
+    ...languageMetrics(monthsOf(period), article, edition, { truncated }),
+  };
 }
 
 /** A language result for stdout: the monthly series stay in analysis.json. */

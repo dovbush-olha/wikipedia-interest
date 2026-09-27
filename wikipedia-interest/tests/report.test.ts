@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { STRINGS } from "../scripts/lib/strings.ts";
-import { analyzeAstronomy, analyzeFasting, ASTRONOMY, FASTING, runCli, tempDir } from "./helpers.ts";
+import { analyzeAstronomy, analyzeFasting, analyzeHistory, ARTICLE_HISTORY, ASTRONOMY, FASTING, runCli, tempDir } from "./helpers.ts";
 
 // Seam B: the report CLI, fed by a real analyze run on recorded fixtures.
 function analyze(reportLang: "uk" | "en", question: string): string {
@@ -137,18 +137,18 @@ describe("report", () => {
       question: "Порівняй інтерес до інтервального голодування в pl і cs",
       heading: "Не оцінено",
       pl: "pl - польська",
-      eu: "eu - баскська",
+      xh: "xh - кхоса",
       phrases: ["Тема може бути описана в іншій статті або розділі", "Це не означає ні низької, ні високої уваги"],
-      shortHistory: "є лише за останні 9 з 24 міс. запитаного періоду",
+      shortHistory: "є лише за останні 17 з 24 міс. запитаного періоду",
     },
     {
       reportLang: "en",
       question: "Compare interest in intermittent fasting in pl and cs",
       heading: "Not assessed",
       pl: "pl - Polish",
-      eu: "eu - Basque",
+      xh: "xh - Xhosa",
       phrases: ["The topic may be covered in another article or section", "This means neither low nor high attention"],
-      shortHistory: "only for the last 9 of the 24 requested months",
+      shortHistory: "only for the last 17 of the 24 requested months",
     },
   ] as const;
   for (const c of notAssessedCases) {
@@ -163,24 +163,69 @@ describe("report", () => {
       const { table, notAssessed } = splitAtNotAssessed(squash(pdf.text), c.heading);
       assert.ok(notAssessed.includes(squash(t.notAssessedNote)), notAssessed);
       assert.ok(notAssessed.includes(squash(`${c.pl}${t.noLinkedArticle}`)), notAssessed);
-      assert.ok(notAssessed.includes(squash(`${c.eu}${t.shortHistory("Aldizkako barau", 9, 24)}`)), notAssessed);
+      assert.ok(notAssessed.includes(squash(`${c.xh}${t.shortHistory("Intermitent fasting", 17, 24)}`)), notAssessed);
       for (const phrase of [...c.phrases, c.shortHistory]) assert.ok(notAssessed.includes(squash(phrase)), phrase);
       // The assessed languages stay in the table, the others only in their group.
       for (const title of ["Přerušovaný půst", "Інтервальне голодування"]) assert.ok(table.includes(squash(title)), table);
-      for (const shown of [c.pl, c.eu, "Aldizkako barau"]) assert.ok(!table.includes(squash(shown)), shown);
+      for (const shown of [c.pl, c.xh, "Intermitent fasting"]) assert.ok(!table.includes(squash(shown)), shown);
     });
   }
 
   it("renders only the group, without a table, when no language is assessed", async () => {
     const runDir = tempDir();
-    assert.equal(analyzeFasting(runDir, "Compare interest in intermittent fasting in pl and eu", { reportLang: "en", langs: "pl,eu" }).status, 0);
+    assert.equal(analyzeFasting(runDir, "Compare interest in intermittent fasting in pl and xh", { reportLang: "en", langs: "pl,xh" }).status, 0);
     assert.equal(runCli("report", ["--run-dir", runDir], FASTING).status, 0);
 
     const pdf = await readPdf(join(runDir, "report.pdf"));
     assert.equal(pdf.pages, 1);
     const { table, notAssessed } = splitAtNotAssessed(squash(pdf.text), "Not assessed");
-    assert.ok(notAssessed.includes(squash("pl - Polish")) && notAssessed.includes(squash("eu - Basque")), notAssessed);
+    assert.ok(notAssessed.includes(squash("pl - Polish")) && notAssessed.includes(squash("xh - Xhosa")), notAssessed);
+    // The history check of a not-assessed article is shown too; pl has no article to check.
+    assert.ok(notAssessed.includes(squash("xh: no historical titles; 0 redirect candidates checked.")), notAssessed);
+    assert.ok(!notAssessed.includes(squash("pl: no historical titles")), notAssessed);
     assert.ok(!table.includes(squash(STRINGS.en.columnViewsPerMillion)), table);
+  });
+
+  it("names the historical titles counted in article views and the redirects checked, per language (uk)", async () => {
+    const runDir = tempDir();
+    assert.equal(analyzeHistory(runDir, "Q9357655", "uk", "uk").status, 0);
+    assert.equal(runCli("report", ["--run-dir", runDir], ARTICLE_HISTORY).status, 0);
+
+    const pdf = await readPdf(join(runDir, "report.pdf"));
+    assert.equal(pdf.pages, 1);
+    const text = squash(pdf.text);
+    assert.ok(text.includes(squash("Перегляди статті включають її історичні назви, підтверджені журналом перейменувань")), pdf.text);
+    assert.ok(text.includes(squash("uk: історичні назви «Малярчук Тетяна Володимирівна», «Малярчук Таня»; перевірено кандидатів на історичну назву: 4.")), pdf.text);
+  });
+
+  it("says when a language has no historical titles, and how many redirects were checked (en)", async () => {
+    const runDir = analyze("en", "Is interest in astronomy growing?");
+    assert.equal(runCli("report", ["--run-dir", runDir], ASTRONOMY).status, 0);
+
+    const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
+    assert.ok(text.includes(squash("Article views include its historical titles confirmed by the move log; other redirects are not counted.")), text);
+    for (const checked of [
+      "uk: no historical titles; 1 redirect candidate checked.",
+      "cs: no historical titles; 3 redirect candidates checked.",
+      "pl: no historical titles; 0 redirect candidates checked.",
+    ]) {
+      assert.ok(text.includes(squash(checked)), `${checked} in ${text}`);
+    }
+  });
+
+  it("shows a truncated history check as a limitation and as what lowered trend reliability", async () => {
+    const runDir = tempDir();
+    assert.equal(analyzeHistory(runDir, "Q49740", "en").status, 0);
+    assert.equal(runCli("report", ["--run-dir", runDir], ARTICLE_HISTORY).status, 0);
+
+    const pdf = await readPdf(join(runDir, "report.pdf"));
+    assert.equal(pdf.pages, 1);
+    const text = squash(pdf.text);
+    assert.ok(text.includes(squash("moderate: history check truncated")), pdf.text);
+    assert.ok(
+      text.includes(squash("en: no historical titles; only the first 50 redirect candidates checked, so historical titles may be missing.")),
+      pdf.text,
+    );
   });
 
   it("has fixed wording for every reason of insufficient data in both report languages", () => {

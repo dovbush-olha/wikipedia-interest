@@ -27,6 +27,7 @@ export type TrendReliability = (typeof RELIABILITY_LEVELS)[number];
 
 /** Reason codes that lower trend reliability, shared with the report that explains them. */
 export const LOW_VOLUME = "low_volume";
+export const HISTORY_CHECK_TRUNCATED = "history_check_truncated";
 const RECENT_SPIKE = "recent_spike:";
 
 /** The spike month of a `recent_spike:YYYY-MM` reason, else null. */
@@ -62,23 +63,36 @@ export type AssessedMetrics = {
  */
 type Insufficient<Reason> = { data_status: "insufficient_data" } & Reason & { trend: null; trend_reliability: null };
 export type NoLinkedArticle = Insufficient<{ reason: "no_linked_article" }>;
-/** A linked article whose views cannot assess the topic. */
-export type InsufficientHistory = Insufficient<{ reason: "short_history"; max_months_available: number } | { reason: "zero_baseline" }>;
+/** A linked article whose views cannot assess the topic; `flags` says when a truncated history check may be why. */
+export type InsufficientHistory = Insufficient<{ reason: "short_history"; max_months_available: number } | { reason: "zero_baseline" }> & {
+  flags: string[];
+};
 export type InsufficientData = NoLinkedArticle | InsufficientHistory;
 
 export type LanguageMetrics = AssessedMetrics | InsufficientHistory;
 
 export type GrowthCompares = { first_12_months: MonthRange; last_12_months: MonthRange };
 
+/** How completely the article's redirects were checked for historical titles: `truncated` when some were not. */
+export type HistoryCheck = { truncated: boolean };
+
 /**
  * Every metric of one language edition over the requested `months`, from its article and edition views;
  * insufficient_data when they cannot assess the topic over the whole period.
+ * A truncated `history` check may have missed historical titles, and so views of the article.
  */
-export function languageMetrics(months: string[], article: MonthlyViews, edition: MonthlyViews): LanguageMetrics {
+export function languageMetrics(
+  months: string[],
+  article: MonthlyViews,
+  edition: MonthlyViews,
+  history: HistoryCheck = { truncated: false },
+): LanguageMetrics {
+  const historyFlags = history.truncated ? [HISTORY_CHECK_TRUNCATED] : [];
   // Months before the article's first month with data are missing (it did not exist yet), not zero views.
   const first = months.findIndex((month) => article.has(month));
   if (first !== 0) {
-    return insufficientData({ reason: "short_history", max_months_available: first === -1 ? 0 : months.length - first });
+    const available = first === -1 ? 0 : months.length - first;
+    return { ...insufficientData({ reason: "short_history", max_months_available: available }), flags: historyFlags };
   }
   const series = relativeAttentionSeries(months, article, edition);
   const raw = series.map((point) => point.article_views);
@@ -87,7 +101,7 @@ export function languageMetrics(months: string[], article: MonthlyViews, edition
   // Edition views are never zero, so a zero relative attention baseline is also a zero raw views baseline.
   const relativeGrowth = growthPct(relative);
   const rawGrowth = growthPct(raw);
-  if (relativeGrowth === null || rawGrowth === null) return insufficientData({ reason: "zero_baseline" });
+  if (relativeGrowth === null || rawGrowth === null) return { ...insufficientData({ reason: "zero_baseline" }), flags: historyFlags };
   // Decided on the rounded growth, so the reported number and the trend never disagree.
   const trend = trendOf(relativeGrowth);
   const changes = yearOverYear(relative);
@@ -106,11 +120,12 @@ export function languageMetrics(months: string[], article: MonthlyViews, edition
     edition_growth_pct: growthPct(series.map((point) => point.edition_views)),
     recent_trend_consistency: { positive_months: changes.filter((change) => change > 0).length, months_compared: changes.length },
     trend,
-    ...reliability(trend, changes, lowVolume, recentSpikes),
+    ...reliability(trend, changes, lowVolume, recentSpikes, history.truncated),
     flags: [
       ...spikes.map((month) => `spike:${month}`),
       ...(lowVolume ? [LOW_VOLUME] : []),
       ...(diverge ? ["raw_relative_diverge"] : []),
+      ...historyFlags,
     ],
   };
 }
@@ -122,13 +137,15 @@ export function insufficientData<Reason extends { reason: InsufficientData["reas
 
 /**
  * heuristic_v1: the level from the recent months in the trend's direction, then one step lower (never below `low`)
- * for low volume and one for any spike in the last 12 months. Raw/relative divergence does not lower it.
+ * for low volume, one for any spike in the last 12 months and one for a truncated history check.
+ * Raw/relative divergence does not lower it.
  */
 function reliability(
   trend: Trend,
   changes: number[],
   lowVolume: boolean,
   recentSpikes: string[],
+  historyTruncated: boolean,
 ): Pick<AssessedMetrics, "trend_reliability" | "reliability_method" | "reliability_reasons"> {
   if (trend === "flat") {
     return { trend_reliability: null, reliability_method: RELIABILITY_METHOD, reliability_reasons: [] };
@@ -143,6 +160,10 @@ function reliability(
   if (recentSpikes.length > 0) {
     level = Math.max(0, level - 1);
     reasons.push(...recentSpikes.map((month) => `${RECENT_SPIKE}${month}`));
+  }
+  if (historyTruncated) {
+    level = Math.max(0, level - 1);
+    reasons.push(HISTORY_CHECK_TRUNCATED);
   }
   return { trend_reliability: RELIABILITY_LEVELS[level], reliability_method: RELIABILITY_METHOD, reliability_reasons: reasons };
 }

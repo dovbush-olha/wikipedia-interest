@@ -1,0 +1,20 @@
+{
+  "url": "https://xh.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Intermitent+fasting",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 8677,
+          "ns": 0,
+          "title": "Intermitent fasting"
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T09:45:27.153Z"
+}

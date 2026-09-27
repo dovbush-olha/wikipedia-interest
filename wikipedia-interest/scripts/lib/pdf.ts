@@ -2,7 +2,7 @@ import { join } from "node:path";
 import PDFDocument from "pdfkit";
 import type { Analysis, AssessedLanguage, NotAssessedLanguage } from "./analysis.ts";
 import { UserError } from "./cli.ts";
-import { LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
+import { HISTORY_CHECK_TRUNCATED, LOW_VOLUME, recentSpikeMonth } from "./metrics.ts";
 import { SKILL_DIR } from "./env.ts";
 import { STRINGS, type Strings } from "./strings.ts";
 
@@ -64,6 +64,19 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
   if (notAssessed.length > 0) {
     doc.moveDown(assessed.length > 0 ? 0.8 : 1.2);
     drawNotAssessed(doc, notAssessed, analysis, languageName, t, width);
+  }
+  // Every article's history check, assessed or not: a missed historical title can also be why a history looks short.
+  const articles = analysis.languages.filter((language) => language.title !== null);
+  if (articles.length > 0) {
+    const historyNote = t.historyNote(
+      articles.map((language) => ({
+        lang: language.lang,
+        titles: language.historical_titles,
+        checked: language.redirect_candidates_checked,
+        truncated: language.flags.includes(HISTORY_CHECK_TRUNCATED),
+      })),
+    );
+    doc.moveDown(notAssessed.length > 0 ? 0.6 : 0).fillColor(MUTED).fontSize(8).text(historyNote, MARGIN, doc.y, { width });
   }
 
   const footer = [[topic.qid, `${t.period}: ${periodText}`, `${t.generated} ${generatedOn}`].join("  ·  "), t.source].join("\n");
@@ -194,6 +207,7 @@ function reliabilityText(language: AssessedLanguage, t: Strings): string {
   if (language.trend_reliability === null) return t.noData;
   const downgrades = language.reliability_reasons.flatMap((reason) => {
     if (reason === LOW_VOLUME) return [t.lowVolume];
+    if (reason === HISTORY_CHECK_TRUNCATED) return [t.historyCheckTruncated];
     const spike = recentSpikeMonth(reason);
     return spike === null ? [] : [t.spike(spike)];
   });

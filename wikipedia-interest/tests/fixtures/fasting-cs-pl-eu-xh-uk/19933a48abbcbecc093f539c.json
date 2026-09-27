@@ -1,0 +1,23 @@
+{
+  "url": "https://eu.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&list=logevents&letype=move&letitle=Aldizkako+baraualdi&leprop=ids%7Ctitle&lelimit=max",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "limits": {
+      "logevents": 500
+    },
+    "query": {
+      "logevents": [
+        {
+          "logid": 1537010,
+          "ns": 0,
+          "title": "Aldizkako baraualdi",
+          "pageid": 1270017,
+          "logpage": 1033157,
+          "revid": 10475047
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T09:44:13.337Z"
+}

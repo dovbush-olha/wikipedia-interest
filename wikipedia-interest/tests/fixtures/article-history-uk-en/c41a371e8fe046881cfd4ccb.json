@@ -1,0 +1,14 @@
+{
+  "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&list=logevents&letype=move&letitle=Minecraft+ipad&leprop=ids%7Ctitle&lelimit=max",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "limits": {
+      "logevents": 500
+    },
+    "query": {
+      "logevents": []
+    }
+  },
+  "fetched_at": "2026-09-27T09:45:33.175Z"
+}

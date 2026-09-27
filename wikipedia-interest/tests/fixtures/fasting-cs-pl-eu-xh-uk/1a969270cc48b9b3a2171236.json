@@ -1,0 +1,26 @@
+{
+  "url": "https://eu.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Aldizkako+barau",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 1033157,
+          "ns": 0,
+          "title": "Aldizkako barau",
+          "redirects": [
+            {
+              "ns": 0,
+              "title": "Aldizkako baraualdi"
+            }
+          ]
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T09:44:13.184Z"
+}

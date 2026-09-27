@@ -1,0 +1,225 @@
+{
+  "url": "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/Minecraft/monthly/2024090100/2026083100",
+  "status": 200,
+  "body": {
+    "items": [
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2024090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 245618
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2024100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 242175
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2024110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 282827
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2024120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 306245
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 383973
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 307992
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 355889
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 627397
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 360984
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 269995
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 286722
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 279889
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025090100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 241400
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025100100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 265408
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025110100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 263977
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2025120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 282124
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 274503
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 273905
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 262757
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 199258
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 170847
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 158762
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 148073
+      },
+      {
+        "project": "en.wikipedia",
+        "article": "Minecraft",
+        "granularity": "monthly",
+        "timestamp": "2026080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 149779
+      }
+    ]
+  },
+  "fetched_at": "2026-09-27T09:45:34.090Z"
+}

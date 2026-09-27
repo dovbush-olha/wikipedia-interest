@@ -7,6 +7,8 @@ import { cacheConfig } from "./env.ts";
 // Wikimedia requires a User-Agent that identifies the client and a way to contact its authors.
 const USER_AGENT = "wikipedia-interest-skill/0.1 (https://github.com/dovbush-olha/wikipedia-interest)";
 const RETRIES = 2;
+/** Requests of one kind at a time: Wikimedia asks API clients not to flood it with parallel requests. */
+export const CONCURRENT_REQUESTS = 4;
 
 /** The host could not be reached at all, e.g. no network or a host that does not exist. */
 export class UnreachableError extends UserError {}
@@ -99,4 +101,18 @@ async function fetchJson(url: string): Promise<JsonResponse> {
 
 function delay(attempt: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 1000 * 2 ** attempt));
+}
+
+/** Like Promise.all over `items.map(task)`, with at most `limit` tasks running at a time; results keep the input order. */
+export async function mapLimited<T, R>(items: T[], limit: number, task: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await task(items[i]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
 }

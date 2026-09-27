@@ -1,9 +1,8 @@
 import type { ReportLang } from "./analysis.ts";
 import { UserError } from "./cli.ts";
 import { getJson, UnreachableError } from "./http.ts";
+import { MAX_AGE_DAYS, wikipediaQuery } from "./wikipedia.ts";
 
-// Labels, sitelinks, titles and search results change rarely, but they do change; refetch them weekly.
-const MAX_AGE_DAYS = 7;
 /** Candidates offered to the agent when the topic is not one exact match. */
 const MAX_CANDIDATES = 5;
 // Search results that are disambiguation pages or lack a Wikidata item are dropped, so ask for more than we keep.
@@ -141,7 +140,7 @@ type QueryResponse = {
 async function exactMatch(query: string, topicLang: string): Promise<ExactMatch> {
   // A title never contains "#": MediaWiki would drop it and what follows, so "C#" would match the letter C.
   if (query.includes("#")) return { kind: "none" };
-  const response = await wikipediaQuery(topicLang, { titles: query, redirects: "1" });
+  const response = await topicQuery(topicLang, { titles: query, redirects: "1" });
   const page = response.query?.pages?.[0];
   if (page === undefined || page.missing || page.invalid || page.ns !== 0) return { kind: "none" };
   if (page.pageprops?.disambiguation !== undefined) return { kind: "disambiguation" };
@@ -155,7 +154,7 @@ async function exactMatch(query: string, topicLang: string): Promise<ExactMatch>
 
 /** Full-text search results in search order, without disambiguation pages and pages without a Wikidata item. */
 async function search(query: string, topicLang: string): Promise<ArticleRef[]> {
-  const response = await wikipediaQuery(topicLang, {
+  const response = await topicQuery(topicLang, {
     generator: "search",
     gsrsearch: query,
     gsrnamespace: "0",
@@ -169,26 +168,14 @@ async function search(query: string, topicLang: string): Promise<ArticleRef[]> {
     });
 }
 
-async function wikipediaQuery(topicLang: string, params: Record<string, string>): Promise<QueryResponse> {
-  const host = `${topicLang}.wikipedia.org`;
-  const search = new URLSearchParams({
-    action: "query",
-    format: "json",
-    formatversion: "2",
-    ...params,
-    prop: "pageprops",
-    ppprop: "wikibase_item|disambiguation",
-  });
-  let body: unknown;
+/** A lookup in the --topic-lang edition, with the Wikidata item and disambiguation flag of every page. */
+async function topicQuery(topicLang: string, params: Record<string, string>): Promise<QueryResponse> {
   try {
-    ({ body } = await getJson(`https://${host}/w/api.php?${search}`, { maxAgeDays: MAX_AGE_DAYS }));
+    return await wikipediaQuery<QueryResponse>(topicLang, { ...params, prop: "pageprops", ppprop: "wikibase_item|disambiguation" }, "topic lookup");
   } catch (error) {
     if (!(error instanceof UnreachableError)) throw error;
     throw new UserError(`${error.message} If the network works, check that --topic-lang ${topicLang} is a Wikipedia language code.`);
   }
-  const response = body as QueryResponse;
-  if (response.error !== undefined) throw new UserError(`${host} rejected the topic lookup: ${response.error.info}`);
-  return response;
 }
 
 /** Candidates with a description and their coverage of `langs`, from one batched Wikidata request. */

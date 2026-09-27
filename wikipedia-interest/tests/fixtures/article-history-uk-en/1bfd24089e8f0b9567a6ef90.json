@@ -1,0 +1,33 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q49740&props=labels%7Cdescriptions%7Csitelinks&languages=en&sitefilter=enwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q49740": {
+        "type": "item",
+        "id": "Q49740",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "Minecraft"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "2011 video game"
+          }
+        },
+        "sitelinks": {
+          "enwiki": {
+            "site": "enwiki",
+            "title": "Minecraft",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T09:45:31.147Z"
+}
