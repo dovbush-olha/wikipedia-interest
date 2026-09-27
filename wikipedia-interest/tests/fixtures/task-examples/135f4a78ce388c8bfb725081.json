@@ -1,0 +1,37 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q1666254&props=labels%7Cdescriptions%7Csitelinks&languages=uk%7Cen&sitefilter=plwiki%7Cskwiki%7Ccswiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q1666254": {
+        "type": "item",
+        "id": "Q1666254",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "intermittent fasting"
+          },
+          "uk": {
+            "language": "uk",
+            "value": "Інтервальне голодування"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "a diet that cycles between a period of fasting and non-fasting"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Přerušovaný půst",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T14:39:29.607Z"
+}

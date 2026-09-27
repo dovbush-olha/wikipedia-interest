@@ -1,0 +1,30 @@
+{
+  "url": "https://pl.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Merkury",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 3699,
+          "ns": 0,
+          "title": "Merkury",
+          "redirects": [
+            {
+              "ns": 0,
+              "title": "Merkury (planeta)"
+            },
+            {
+              "ns": 0,
+              "title": "Równina Żaru"
+            }
+          ]
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:14.508Z"
+}

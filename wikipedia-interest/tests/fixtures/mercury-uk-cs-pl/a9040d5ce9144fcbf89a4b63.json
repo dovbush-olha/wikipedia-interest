@@ -1,0 +1,21 @@
+{
+  "url": "https://uk.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&titles=%D0%9C%D0%B5%D1%80%D0%BA%D1%83%D1%80%D1%96%D0%B9&redirects=1&prop=pageprops&ppprop=wikibase_item%7Cdisambiguation",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 46076,
+          "ns": 0,
+          "title": "Меркурій",
+          "pageprops": {
+            "disambiguation": "",
+            "wikibase_item": "Q16675960"
+          }
+        }
+      ]
+    }
+  },
+  "fetched_at": "2026-09-27T14:39:11.803Z"
+}

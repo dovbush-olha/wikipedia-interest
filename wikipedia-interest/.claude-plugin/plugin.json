@@ -1,3 +1,8 @@
 {
-  "name": "wikipedia-interest"
+  "name": "wikipedia-interest",
+  "version": "0.1.0",
+  "description": "Agent skill: relative attention to a topic across Wikipedia language editions, with a one-page PDF report.",
+  "author": {
+    "name": "Olha Dovbush"
+  }
 }
