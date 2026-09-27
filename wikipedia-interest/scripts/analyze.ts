@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { ANALYSIS_FILE, MAX_LANGUAGES, REPORT_LANGS, type Analysis, type LanguageResult, type ReportLang } from "./lib/analysis.ts";
 import { parseCliArgs, printJson, runMain, UserError } from "./lib/cli.ts";
 import { isInsideSkillDir, SKILL_DIR, today } from "./lib/env.ts";
-import { relativeAttentionSeries, viewsPerMillion } from "./lib/metrics.ts";
+import { growthCompares, languageMetrics } from "./lib/metrics.ts";
 import { articleViews, editionViews } from "./lib/pageviews.ts";
 import { monthsOf, requestedPeriod, type Period } from "./lib/period.ts";
 import { resolveQid } from "./lib/resolve.ts";
@@ -63,6 +63,7 @@ await runMain(async () => {
     as_of: asOf,
     measured_topic: topic,
     period,
+    growth_compares: growthCompares(period),
     languages,
   };
   const analysisFile = join(outDir, ANALYSIS_FILE);
@@ -87,8 +88,7 @@ async function analyzeLanguage(lang: string, title: string | null, qid: string, 
   // Edition first: it fails while the --end month is unpublished, before the article's incomplete views get cached for good.
   const edition = await editionViews(lang, period);
   const article = await articleViews(lang, title, period);
-  const series = relativeAttentionSeries(monthsOf(period), article, edition);
-  return { lang, title, views_per_million: viewsPerMillion(series), series };
+  return { lang, title, ...languageMetrics(monthsOf(period), article, edition) };
 }
 
 /** Like Promise.all, but a failure is always the first one in input order, not whichever settled first. */

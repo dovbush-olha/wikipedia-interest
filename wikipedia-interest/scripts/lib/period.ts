@@ -2,7 +2,8 @@ import { UserError } from "./cli.ts";
 
 // Months are "YYYY-MM" strings; all arithmetic is in UTC. Such strings also compare correctly as text.
 
-export type Period = { start: string; end: string; months: number };
+export type MonthRange = { start: string; end: string };
+export type Period = MonthRange & { months: number };
 
 /** The first 12 and the last 12 months of a requested period must not overlap. */
 export const MIN_MONTHS = 24;
