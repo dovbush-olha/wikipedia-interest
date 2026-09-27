@@ -1,0 +1,27 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q130192&props=labels%7Cdescriptions%7Csitelinks&languages=uk%7Cen&sitefilter=ukwiki%7Ccswiki%7Cplwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q130192": {
+        "type": "item",
+        "id": "Q130192",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "English as a second or foreign language"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "use of English by speakers with different native languages"
+          }
+        },
+        "sitelinks": {}
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T08:57:32.370Z"
+}

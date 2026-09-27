@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { UserError } from "./cli.ts";
 import type { AssessedMetrics, GrowthCompares, InsufficientHistory, NoLinkedArticle } from "./metrics.ts";
 import type { Period } from "./period.ts";
+import type { TopicMatch, WikidataTopic } from "./resolve.ts";
 
 // The analysis result: written by analyze.ts to analysis.json, read by report.ts.
 
@@ -14,14 +15,9 @@ export const ANALYSIS_FILE = "analysis.json";
 /** Language editions one analysis may compare: every one of them, assessed or not, takes room on the one-page report. */
 export const MAX_LANGUAGES = 6;
 
-export type MeasuredTopic = {
-  qid: string;
-  label: string;
-  /** Language of `label`: the report language, else English; null when Wikidata has neither and the QID is shown. */
-  label_lang: string | null;
-  description: string | null;
-  description_lang: string | null;
-};
+/** One Wikidata item for every language of the analysis; a proxy is an explicit assumption of the report. */
+export type MeasuredTopic = WikidataTopic &
+  ({ relation_to_question: "direct"; proxy_reason: null } | { relation_to_question: "proxy"; proxy_reason: string });
 
 export type MonthPoint = {
   month: string;
@@ -42,6 +38,8 @@ export type Analysis = {
   /** The date (YYYY-MM-DD) the default --end was derived from. */
   as_of: string;
   measured_topic: MeasuredTopic;
+  /** How --topic resolved to the measured topic; null when it was given as --qid. */
+  topic_match: TopicMatch | null;
   period: Period;
   /** The months every growth in `languages` compares. */
   growth_compares: GrowthCompares;

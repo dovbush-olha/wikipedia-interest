@@ -8,6 +8,9 @@ import { cacheConfig } from "./env.ts";
 const USER_AGENT = "wikipedia-interest-skill/0.1 (https://github.com/dovbush-olha/wikipedia-interest)";
 const RETRIES = 2;
 
+/** The host could not be reached at all, e.g. no network or a host that does not exist. */
+export class UnreachableError extends UserError {}
+
 export type JsonResponse = { status: 200 | 404; body: unknown };
 
 type CacheEntry = JsonResponse & { url: string; fetched_at: string };
@@ -77,7 +80,7 @@ async function fetchJson(url: string): Promise<JsonResponse> {
         await delay(attempt);
         continue;
       }
-      throw new UserError(`could not reach ${host} (${(error as Error).message}). Check the network and rerun.`);
+      throw new UnreachableError(`could not reach ${host} (${(error as Error).message}). Check the network and rerun.`);
     }
     if (response.status === 200 || response.status === 404) {
       try {

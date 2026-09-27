@@ -41,22 +41,33 @@ export function noNetworkEnv(now: string): Record<string, string> {
 export const ASTRONOMY = fixtureEnv("astronomy-uk-cs-pl", "2026-09-15");
 
 // Also recorded for 2024-03..2026-08, and for 2024-10..2026-09 on 2026-09-27, before Wikimedia published 2026-09.
+// Also recorded on 2026-09-27: --topic Astronomy (en) and астрономія (uk), and Q130192, which has no uk label and no article in uk, cs or pl.
 export function analyzeAstronomy(
   outDir: string,
   question: string,
-  { reportLang = "uk", periodArgs = [], env = ASTRONOMY }: { reportLang?: "uk" | "en"; periodArgs?: string[]; env?: Record<string, string> } = {},
+  {
+    reportLang = "uk",
+    periodArgs = [],
+    extraArgs = [],
+    env = ASTRONOMY,
+  }: { reportLang?: "uk" | "en"; periodArgs?: string[]; extraArgs?: string[]; env?: Record<string, string> } = {},
 ): CliResult {
   return runCli(
     "analyze",
-    ["--qid", "Q333", "--langs", "uk,cs,pl", "--user-question", question, "--report-lang", reportLang, "--out-dir", outDir, ...periodArgs],
+    ["--qid", "Q333", "--langs", "uk,cs,pl", "--user-question", question, "--report-lang", reportLang, "--out-dir", outDir, ...periodArgs, ...extraArgs],
     env,
   );
 }
 
 // Q1666254 (intermittent fasting) in cs, pl, eu and uk, recorded on 2026-09-27 for the period 2024-09..2026-08,
 // the default period of a fixed "today" of 2026-09-15: pl has no article linked in Wikidata, and the eu article has views only from 2025-12.
-// Also recorded: pl and eu alone in English, and cs with ua, a language code without a Wikipedia.
+// Also recorded: pl and eu alone in English, cs with ua, a language code without a Wikipedia, and --topic "Periodic fasting" (en).
 export const FASTING = fixtureEnv("fasting-cs-pl-eu-uk", "2026-09-15");
+
+// Topic search in English Wikipedia for uk, cs and pl, recorded on 2026-09-27: "Mercury" and "learning English" are
+// disambiguation pages, "Stellar astronomy" redirects to a section of Astronomy, a quoted fasting query has one search result,
+// and "qzxvwkjhplm" has none. Only resolver responses: nothing past needs_choice or not_found.
+export const TOPIC_SEARCH = fixtureEnv("topic-search-uk-cs-pl", "2026-09-15");
 
 export function analyzeFasting(
   outDir: string,
