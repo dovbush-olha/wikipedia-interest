@@ -1,0 +1,43 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q1666254&props=labels%7Cdescriptions%7Csitelinks&languages=en&sitefilter=enwiki%7Cdewiki%7Cfrwiki%7Cplwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q1666254": {
+        "type": "item",
+        "id": "Q1666254",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "intermittent fasting"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "a diet that cycles between a period of fasting and non-fasting"
+          }
+        },
+        "sitelinks": {
+          "dewiki": {
+            "site": "dewiki",
+            "title": "Intermittierendes Fasten",
+            "badges": []
+          },
+          "enwiki": {
+            "site": "enwiki",
+            "title": "Intermittent fasting",
+            "badges": []
+          },
+          "frwiki": {
+            "site": "frwiki",
+            "title": "Jeûne intermittent",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-27T13:26:56.042Z"
+}

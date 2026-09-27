@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
+import { MAX_LANGUAGES } from "../scripts/lib/analysis.ts";
 import {
   analyzeAstronomy as analyzeAstronomyWith,
   analyzeFasting,
@@ -449,18 +450,21 @@ describe("analyze requested period errors", () => {
 });
 
 describe("analyze language limit", () => {
+  // Language editions with a Wikipedia, in the order a user might list them.
+  const langs = (count: number) => ["uk", "pl", "cs", "de", "fr", "es", "it", "nl", "sv", "pt"].slice(0, count).join(",");
+
   it("rejects more than MAX_LANGUAGES languages before any network request", () => {
-    const result = analyzeWithoutNetwork(["--langs", "uk,pl,cs,de,fr,es,it"]);
+    const result = analyzeWithoutNetwork(["--langs", langs(MAX_LANGUAGES + 1)]);
 
     assert.equal(result.status, 1);
     assert.equal(result.stdout, "");
-    assert.match(result.stderr, /^Error: 7 languages requested, at most 6 allowed in one analysis/);
-    assert.match(result.stderr, /shortlist up to 6 languages/);
+    assert.match(result.stderr, new RegExp(`^Error: ${MAX_LANGUAGES + 1} languages requested, at most ${MAX_LANGUAGES} allowed in one analysis`));
+    assert.match(result.stderr, new RegExp(`shortlist up to ${MAX_LANGUAGES} languages`));
     assert.doesNotMatch(result.stderr, /offline mode/);
   });
 
   it("accepts exactly MAX_LANGUAGES languages", () => {
-    const result = analyzeWithoutNetwork(["--langs", "uk,pl,cs,de,fr,es"]);
+    const result = analyzeWithoutNetwork(["--langs", langs(MAX_LANGUAGES)]);
 
     // Past the limit check, the run reaches the network and stops at the empty offline cache.
     assert.equal(result.status, 1);

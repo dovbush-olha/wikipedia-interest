@@ -1,7 +1,9 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import type { Conclusion } from "../scripts/lib/conclusion.ts";
 import { SKILL_DIR } from "../scripts/lib/env.ts";
 
 export type CliResult = { status: number | null; stdout: string; stderr: string };
@@ -99,15 +101,65 @@ export function analyzeHistory(outDir: string, qid: string, lang: string, report
   );
 }
 
-// 120 months (2016-09..2026-08), recorded on 2026-09-27 with a fixed "today" of 2026-09-15:
-// Q333 (astronomy) in uk, cs, pl, en, de and fr, all assessed, and Q1666254 (intermittent fasting) in cs, uk, en, de, fr and pl,
-// where cs and uk have a short history and pl has no article linked in Wikidata.
-export const LONG_PERIOD = fixtureEnv("report-120-months-6-langs", "2026-09-15");
+// 120 months (2016-09..2026-08), recorded on 2026-09-27 with a fixed "today" of 2026-09-15, in both report languages:
+// Q333 (astronomy) in uk, cs, en and de, all assessed, and Q1666254 (intermittent fasting) in en, de, fr and pl,
+// where pl has no article linked in Wikidata. Also recorded in English: Q1666254 in cs, en, de and pl, where cs has a short history.
+export const LONG_PERIOD = fixtureEnv("report-120-months-4-langs", "2026-09-15");
 
-export function analyzeLongPeriod(outDir: string, qid: "Q333" | "Q1666254", langs: string, extraArgs: string[] = []): CliResult {
+export function analyzeLongPeriod(
+  outDir: string,
+  qid: "Q333" | "Q1666254",
+  langs: string,
+  { reportLang = "en", extraArgs = [] }: { reportLang?: "uk" | "en"; extraArgs?: string[] } = {},
+): CliResult {
   return runCli(
     "analyze",
-    ["--qid", qid, "--langs", langs, "--months", "120", "--report-lang", "en", "--out-dir", outDir, ...extraArgs],
+    ["--qid", qid, "--langs", langs, "--months", "120", "--report-lang", reportLang, "--out-dir", outDir, ...extraArgs],
     LONG_PERIOD,
   );
+}
+
+/** A conclusion.json that passes every check: one entry per assessed language of the run's analysis.json. */
+export function validConclusion(runDir: string): Conclusion {
+  const analysis = JSON.parse(readFileSync(join(runDir, "analysis.json"), "utf8"));
+  const uk = analysis.report_lang === "uk";
+  return {
+    summary: uk
+      ? "Відносна увага до теми відрізняється між мовними розділами; наступним варто дослідити розділ з найстабільнішим трендом."
+      : "Relative attention to the topic differs between the language editions; research the one with the steadiest trend next.",
+    languages: analysis.languages
+      .filter((language: { data_status: string }) => language.data_status === "ok")
+      .map((language: { lang: string }) => ({
+        lang: language.lang,
+        action: "consider" as const,
+        rationale: uk ? "Тренд відносної уваги узгоджений з трафіком розділу." : "The relative attention trend agrees with the edition views.",
+      })),
+  };
+}
+
+/** Writes conclusion.json into the run folder: a value as JSON, a string as is. */
+export function writeConclusion(runDir: string, conclusion: unknown): void {
+  writeFileSync(join(runDir, "conclusion.json"), typeof conclusion === "string" ? conclusion : JSON.stringify(conclusion, null, 2));
+}
+
+/** Runs report.ts on a run folder, with a valid conclusion.json unless one is given. */
+export function runReport(runDir: string, env: Record<string, string>, conclusion: unknown = validConclusion(runDir)): CliResult {
+  writeConclusion(runDir, conclusion);
+  return runCli("report", ["--run-dir", runDir], env);
+}
+
+/** The page count and the text of a PDF, as a reader extracts it. */
+export async function readPdf(file: string): Promise<{ pages: number; text: string }> {
+  const pdf = await getDocument({ data: new Uint8Array(readFileSync(file)) }).promise;
+  let text = "";
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const content = await (await pdf.getPage(n)).getTextContent();
+    text += content.items.map((item) => ("str" in item ? item.str : "")).join("");
+  }
+  return { pages: pdf.numPages, text };
+}
+
+// Line wrapping and text runs split words unpredictably, so compare text without whitespace.
+export function squash(text: string): string {
+  return text.replace(/\s+/g, "");
 }
