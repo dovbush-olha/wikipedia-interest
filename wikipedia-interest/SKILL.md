@@ -39,9 +39,10 @@ Run every command from the user's current working directory, never `cd` into the
 
 1. Build the `analyze.ts` arguments (next section) and run it.
 2. Handle its `status`: `needs_choice`, `not_found` or `ok`.
-3. On `ok`, answer the user in the chat with the template of section 4: this is your only answer about the result.
-4. Write `conclusion.json` into the `--out-dir`.
-5. Run `report.ts`, fix `conclusion.json` until it succeeds, and end with one line: the PDF path.
+3. On `ok`, write `conclusion.json` into the `--out-dir`.
+4. Run `report.ts` and fix `conclusion.json` until it succeeds.
+5. Answer the user once, in your last message, with the template of section 6: the result, the recommendation and the PDF path.
+   Say nothing about the result before it.
 
 If a command fails with `Cannot find package`, run `npm ci --prefix "${CLAUDE_SKILL_DIR}"` once and rerun the command.
 If `npm ci` fails with `EBADENGINE`, tell the user the skill needs Node.js 24.12 or later.
@@ -52,7 +53,8 @@ If `npm ci` fails with `EBADENGINE`, tell the user the skill needs Node.js 24.12
 node "${CLAUDE_SKILL_DIR}/scripts/analyze.ts" --topic "Intermittent fasting" --topic-lang en --langs pl,cs --months 24 --report-lang uk --user-question "<the user's question>" --out-dir wikipedia-interest-runs/fasting-pl-cs
 ```
 
-- `--user-question`: the user's question as they wrote it.
+- `--user-question`: the user's message word for word, copied from the user's message, not from your own words or the skill arguments.
+  Never shorten, translate or rephrase it: "вивчення англійської" must not become "англійська мова".
   For a follow-up, the original question plus the change in a few words.
 - `--report-lang`: `uk` when the user writes in Ukrainian, otherwise `en`.
   It is the language of the PDF, of `conclusion.json` and of your answer in the chat.
@@ -65,8 +67,9 @@ node "${CLAUDE_SKILL_DIR}/scripts/analyze.ts" --topic "Intermittent fasting" --t
   - `--qid Q...` instead of `--topic` and `--topic-lang`, once you know the Wikidata item: from a `needs_choice` candidate or from `measured_topic.qid` of an earlier analysis.
   - `--proxy-reason "<how it differs>"` when the measured topic is broader or narrower than the topic of the question.
     One short sentence in the report language, starting with a capital letter; the PDF shows it after its own sentence about the proxy.
-- Direct or proxy: questions about an activity around a subject ("learning English", "astronomy courses", "fasting apps") rarely have their own article.
-  Measure the subject itself as a proxy, e.g. `--topic "English language" --proxy-reason "Увага до англійської мови загалом, а не лише до її вивчення."`.
+- Direct or proxy: decide from the user's own words before the first run.
+  Questions about an activity around a subject ("learning English", «вивчення англійської», "astronomy courses", "fasting apps") rarely have their own article.
+  Measure the subject itself as a proxy, always with `--proxy-reason`, e.g. `--topic "English language" --proxy-reason "Увага до англійської мови загалом, а не лише до її вивчення."`.
 - Period: the default is the last 24 completed months.
   "Last two years" is `--months 24`, "last N years" is `--months` 12×N, "since March 2022" is `--start 2022-03`, and `--end YYYY-MM` fixes the last month.
   A period has at least 24 months and starts not before 2015-07; `--start` and `--months` cannot be combined.
@@ -98,9 +101,10 @@ If it is still not found, tell the user.
 
 ### `ok`
 
-Check that `measured_topic.label` and `description` are the topic of the question.
+Check that `measured_topic.label` and `description` are the topic of the user's own words.
+If `relation_to_question` is `direct` but the question is about an activity around the measured topic (learning English, not the English language), rerun with `--qid <measured_topic.qid>` and `--proxy-reason`.
 If `topic_match.redirected_from` is not null, the topic text was a redirect to a larger article; if that article is broader than the question, rerun with `--qid <measured_topic.qid>` and `--proxy-reason`.
-If the question compares languages but fewer than two are assessed, say that this topic allows no comparison between them, and word the assessed one as usual.
+If the question compares languages but fewer than two are assessed, the answer has the "No comparison" line of section 6.
 If no language is assessed, tell the user with the "Not assessed" wordings, do not run `report.ts`, and suggest another topic, other languages or a shorter period.
 
 ## 3. Word the result
@@ -162,43 +166,7 @@ The only thing to add: this audience needs other data sources.
 A not-assessed language may also have the flag `history_check_truncated`: add its flag wording.
 For `short_history` you may offer a separate analysis over a shorter period; every language of it then uses that shorter period.
 
-## 4. Answer in the chat
-
-Answer in the report language with this template, filled from the result and the wording tables, and nothing else.
-Copy numbers exactly as `analyze.ts` printed them; never compute new ones (no differences, ratios, averages or rounding).
-Leave out a line whose part of the result is empty: "Proxy" for a direct topic, "Not assessed" when every language is assessed.
-
-```
-Measured topic: <measured_topic.label> (<measured_topic.qid>).
-Proxy: <measured_topic.proxy_reason>
-Changes compare the median of <last_12_months.start> - <last_12_months.end> with the median of <first_12_months.start> - <first_12_months.end>.
-
-<lang>: <trend wording>, relative attention change <relative_attention_growth_pct>%, <views_per_million> views per million views of the edition. <reliability wording>: <every reason wording>. <every flag wording>.
-
-Not assessed:
-<lang>: <reason wording>
-
-Next-research recommendation based on the Wikipedia signal (not a product launch decision):
-<lang>: <action wording> - <rationale>
-```
-
-```
-Виміряна тема: <measured_topic.label> (<measured_topic.qid>).
-Проксі: <measured_topic.proxy_reason>
-Зміни порівнюють медіану за <last_12_months.start> - <last_12_months.end> з медіаною за <first_12_months.start> - <first_12_months.end>.
-
-<lang>: <формулювання тренду>, зміна відносної уваги <relative_attention_growth_pct>%, <views_per_million> переглядів на мільйон переглядів розділу. <формулювання надійності>: <формулювання кожної причини>. <формулювання кожного прапорця>.
-
-Не оцінено:
-<lang>: <формулювання причини>
-
-Рекомендація щодо наступного дослідження на основі Wikipedia-сигналу (не рішення про запуск продукту):
-<lang>: <формулювання дії> - <rationale>
-```
-
-The recommendation lines are the same as in `conclusion.json` (section 5): decide them before you answer.
-
-## 5. Write conclusion.json
+## 4. Write conclusion.json
 
 Write `<out-dir>/conclusion.json`, the interpretation for the PDF:
 
@@ -212,7 +180,8 @@ Write `<out-dir>/conclusion.json`, the interpretation for the PDF:
 }
 ```
 
-- `summary`: at most 200 characters, the answer to the question about the assessed languages only; never mention a not-assessed language, the PDF shows those itself.
+- `summary`: at most 200 characters, the answer to the question about the assessed languages only.
+  Never mention a not-assessed language, not even that it has no article or was not assessed: the PDF shows those itself.
 - `languages`: exactly one entry per assessed language, and none for a not-assessed one.
 - `action`: one of `investigate_next`, `consider`, `lower_priority`.
 - `rationale`: at most 120 characters, why that action, from the trend and its reliability only.
@@ -229,16 +198,61 @@ Unless the user gave their own criteria, choose the action from the trend and it
 
 Between languages with the same action, a higher `views_per_million` may be the reason to name one first.
 
-## 6. Run report
+## 5. Run report
 
 ```
 node "${CLAUDE_SKILL_DIR}/scripts/report.ts" --run-dir wikipedia-interest-runs/fasting-pl-cs
 ```
 
-On success it prints `files.report`: your last message is one line with that PDF path.
-Do not repeat, summarize or extend the answer of section 4: no second conclusion and no advice.
+On success it prints `files.report`, the PDF path for the last line of your answer.
 On an error, change `conclusion.json` exactly as the message says, fixing every problem it lists, and rerun `report.ts`.
 Never edit `analysis.json`; if the message says to rerun `analyze.ts`, do that.
+
+## 6. Answer in the chat
+
+Once `report.ts` has succeeded, answer in the report language with this template, filled from the result and the wording tables, and nothing else.
+This is your only message about the result, and the template is all of it: no headings or bold, no second conclusion, no advice and no other topics or languages to research.
+The "PDF:" line is the last line; write nothing after it.
+Copy numbers and months exactly as `analyze.ts` printed them, months as `YYYY-MM`; never compute new ones (no differences, ratios, averages or rounding).
+Leave out a line whose part of the result is empty: "Proxy" for a direct topic, "Not assessed" when every language is assessed.
+Write the "No comparison" line only when the question compares language editions and fewer than two are assessed.
+Start each language line with its code, e.g. `pl:`, as in the template.
+
+```
+Measured topic: <measured_topic.label> (<measured_topic.qid>).
+Proxy: <measured_topic.proxy_reason>
+No comparison: only <lang> is assessed, so this topic allows no comparison between the requested language editions.
+Changes compare the median of <last_12_months.start> - <last_12_months.end> with the median of <first_12_months.start> - <first_12_months.end>.
+
+<lang>: <trend wording>, relative attention change <relative_attention_growth_pct>%, <views_per_million> views per million views of the edition. <reliability wording>: <every reason wording>. <every flag wording>.
+
+Not assessed:
+<lang>: <reason wording>
+
+Next-research recommendation based on the Wikipedia signal (not a product launch decision):
+<lang>: <action wording> - <rationale>
+
+PDF: <files.report>
+```
+
+```
+Виміряна тема: <measured_topic.label> (<measured_topic.qid>).
+Проксі: <measured_topic.proxy_reason>
+Порівняння неможливе: оцінено лише <lang>, тож за цією темою запитані мовні розділи порівняти неможливо.
+Зміни порівнюють медіану за <last_12_months.start> - <last_12_months.end> з медіаною за <first_12_months.start> - <first_12_months.end>.
+
+<lang>: <формулювання тренду>, зміна відносної уваги <relative_attention_growth_pct>%, <views_per_million> переглядів на мільйон переглядів розділу. <формулювання надійності>: <формулювання кожної причини>. <формулювання кожного прапорця>.
+
+Не оцінено:
+<lang>: <формулювання причини>
+
+Рекомендація щодо наступного дослідження на основі Wikipedia-сигналу (не рішення про запуск продукту):
+<lang>: <формулювання дії> - <rationale>
+
+PDF: <files.report>
+```
+
+The recommendation lines are the `action` and `rationale` of `conclusion.json` (section 4), one per assessed language, with the action worded by the table of section 4.
 
 ## Errors
 

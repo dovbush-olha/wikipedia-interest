@@ -12,10 +12,13 @@ const EVALS_DIR = join(SKILL_DIR, "evals");
 // Every case checks the whole flow with the same graders: analyze before report, conclusion.json, the PDF, report.ts succeeding.
 const SHARED_GRADERS = ["analyze-before-report.md", "conclusion-written.md", "report-pdf-created.md", "report-succeeded.md"];
 
-type Expected = { args: string[]; status: "ok" | "needs_choice"; qid?: string };
+/** An analyze command and what it must answer: the measured topic, or a choice that offers the candidate the case expects. */
+type AnalyzeCommand = { args: string[] } & ({ status: "ok"; qid: string } | { status: "needs_choice"; candidate?: string });
+
+const PROXY_REASON = ["--proxy-reason", "Увага до англійської мови загалом."];
 
 // The analyze commands a model may run for each case: the topic as English and as Ukrainian text, and the chosen --qid.
-const CASES: Record<string, Expected[]> = {
+const CASES: Record<string, AnalyzeCommand[]> = {
   "fasting-pl-cs": [
     { args: ["--topic", "Intermittent fasting", "--topic-lang", "en", "--langs", "pl,cs"], status: "ok", qid: "Q1666254" },
     { args: ["--topic", "інтервальне голодування", "--topic-lang", "uk", "--langs", "pl,cs"], status: "ok", qid: "Q1666254" },
@@ -28,15 +31,18 @@ const CASES: Record<string, Expected[]> = {
   "learning-english-proxy": [
     { args: ["--topic", "learning English", "--topic-lang", "en", "--langs", "uk,pl,cs"], status: "needs_choice" },
     {
-      args: ["--topic", "English language", "--topic-lang", "en", "--langs", "uk,pl,cs", "--proxy-reason", "Увага до англійської мови загалом."],
+      args: ["--topic", "English language", "--topic-lang", "en", "--langs", "uk,pl,cs", ...PROXY_REASON],
       status: "ok",
       qid: "Q1860",
     },
-    { args: ["--qid", "Q1860", "--langs", "uk,pl,cs", "--proxy-reason", "Увага до англійської мови загалом."], status: "ok", qid: "Q1860" },
+    { args: ["--qid", "Q1860", "--langs", "uk,pl,cs", ...PROXY_REASON], status: "ok", qid: "Q1860" },
   ],
+  // tests/fixtures/mercury-uk-cs-pl, recorded on 2026-09-27 with a fixed "today" of 2026-09-15 in both report languages:
+  // "Mercury" (en) and "Меркурій" (uk) are disambiguation pages with the planet Q308 among the candidates, and
+  // "Mercury (planet)", "Меркурій (планета)" and Q308 are the planet itself.
   "mercury-ambiguous": [
-    { args: ["--topic", "Mercury", "--topic-lang", "en", "--langs", "uk,cs,pl"], status: "needs_choice", qid: "Q308" },
-    { args: ["--topic", "Меркурій", "--topic-lang", "uk", "--langs", "uk,cs,pl"], status: "needs_choice", qid: "Q308" },
+    { args: ["--topic", "Mercury", "--topic-lang", "en", "--langs", "uk,cs,pl"], status: "needs_choice", candidate: "Q308" },
+    { args: ["--topic", "Меркурій", "--topic-lang", "uk", "--langs", "uk,cs,pl"], status: "needs_choice", candidate: "Q308" },
     { args: ["--qid", "Q308", "--langs", "uk,cs,pl"], status: "ok", qid: "Q308" },
   ],
   "follow-up-add-slovak": [
@@ -72,6 +78,16 @@ describe("evals", () => {
     }
   });
 
+  it("continues the follow-up from a first session of example 1 that the resume can walk whole", () => {
+    const history = readFileSync(join(EVALS_DIR, "follow-up-add-slovak", "first-session.jsonl"), "utf8").trim().split("\n");
+    const records = history.map((line) => JSON.parse(line));
+    // The resume walks parentUuid back from the last record and silently drops every record it does not reach.
+    records.forEach((record, i) => assert.equal(record.parentUuid, i === 0 ? null : records[i - 1].uuid, `record ${i}`));
+    const firstPrompt = readFileSync(join(EVALS_DIR, "fasting-pl-cs", "prompt.md"), "utf8").split("\n---\n")[1].trim();
+    assert.equal(records[0].message.content, firstPrompt);
+    assert.ok(records.some((record) => JSON.stringify(record.message.content).includes("scripts/report.ts")), "the first session ran report.ts");
+  });
+
   for (const [name, commands] of Object.entries(CASES)) {
     describe(name, () => {
       it("runs offline on a fixture folder of the skill with a fixed today", () => {
@@ -82,18 +98,20 @@ describe("evals", () => {
         assert.ok(existsSync(join(SKILL_DIR, env.EVAL_WIKI_INTEREST_CACHE_DIR)), env.EVAL_WIKI_INTEREST_CACHE_DIR);
       });
 
-      for (const { args, status, qid } of commands) {
-        it(`answers analyze ${args.join(" ")} from the fixtures`, () => {
+      for (const command of commands) {
+        it(`answers analyze ${command.args.join(" ")} from the fixtures`, () => {
           const result = runCli(
             "analyze",
-            [...args, "--report-lang", "uk", "--user-question", "Питання користувача", "--out-dir", tempDir()],
+            [...command.args, "--report-lang", "uk", "--user-question", "Питання користувача", "--out-dir", tempDir()],
             caseEnv(name),
           );
           assert.equal(result.status, 0, result.stderr);
           const out = JSON.parse(result.stdout);
-          assert.equal(out.status, status);
-          if (status === "ok") assert.equal(out.measured_topic.qid, qid);
-          if (status === "needs_choice" && qid !== undefined) assert.ok(out.candidates.some((c: { qid: string }) => c.qid === qid), `no ${qid} candidate`);
+          assert.equal(out.status, command.status);
+          if (command.status === "ok") assert.equal(out.measured_topic.qid, command.qid);
+          else if (command.candidate !== undefined) {
+            assert.ok(out.candidates.some((c: { qid: string }) => c.qid === command.candidate), `no ${command.candidate} candidate`);
+          }
         });
       }
     });

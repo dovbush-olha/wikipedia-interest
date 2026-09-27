@@ -158,6 +158,9 @@ function textProblems(text: unknown, field: string, limit: number, analysis: Ana
       `digit in ${field} (${quoted(withDigits)}). Numbers are rendered from analysis.json; describe the finding in words.`,
     );
   }
+  for (const [lang, mention] of notAssessedMentions(text, analysis)) {
+    problems.push(`${field} names the not-assessed language edition ${lang} ("${mention}"). Remove it: the PDF shows not-assessed language editions itself.`);
+  }
   const unsupported = unsupportedCharacters(text);
   if (unsupported.length > 0) {
     problems.push(
@@ -166,6 +169,38 @@ function textProblems(text: unknown, field: string, limit: number, analysis: Ana
     );
   }
   return problems;
+}
+
+// How a text names a language edition, for the editions SKILL.md lists: Ukrainian stems, so that every case form matches
+// («польський розділ», «польськомовною Wikipedia»), and English names. A stem alone is not enough: «польська кухня» or
+// «англійська мова» is a topic, not an edition, so the stem must be followed by an edition word or be the «-мовний» form.
+const EDITION_NAMES: Record<string, { uk: string[]; en: string }> = {
+  uk: { uk: ["українськ", "україномовн"], en: "Ukrainian" },
+  pl: { uk: ["польськ"], en: "Polish" },
+  cs: { uk: ["чеськ"], en: "Czech" },
+  sk: { uk: ["словацьк"], en: "Slovak" },
+  de: { uk: ["німецьк"], en: "German" },
+  en: { uk: ["англійськ", "англомовн"], en: "English" },
+  es: { uk: ["іспанськ"], en: "Spanish" },
+  fr: { uk: ["французьк", "франкомовн"], en: "French" },
+};
+
+/** The not-assessed language editions a text names, by code or by name, with the words that name each. */
+function notAssessedMentions(text: string, analysis: Analysis): [string, string][] {
+  const mentions: [string, string][] = [];
+  for (const language of analysis.languages) {
+    if (language.data_status === "ok") continue;
+    const patterns = [`(?<!\\p{L})${language.lang}(?!\\p{L})`];
+    const names = EDITION_NAMES[language.lang];
+    if (names !== undefined) {
+      const stems = names.uk.join("|");
+      patterns.push(`(?:${stems})\\p{L}*(?:\\s+мовн\\p{L}*)?\\s+(?:розділ|вікіпеді|wikipedia)\\p{L}*`, `(?:${stems})\\p{L}*мовн\\p{L}*`);
+      patterns.push(`(?<!\\p{L})${names.en}\\s+(?:(?:language\\s+)?edition|Wikipedia)`);
+    }
+    const match = text.match(new RegExp(patterns.join("|"), "iu"));
+    if (match !== null) mentions.push([language.lang, match[0]]);
+  }
+  return mentions;
 }
 
 function quoted(values: string[]): string {

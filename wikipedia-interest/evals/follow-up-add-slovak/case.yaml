@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: follow-up-add-slovak
+context:
+  # A real first session of example 1 on Claude Haiku 4.5 (evals/fasting-pl-cs), whose run folder no longer exists.
+  history_file: first-session.jsonl
