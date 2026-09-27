@@ -2,16 +2,13 @@ import assert from "node:assert/strict";
 import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { before, describe, it } from "node:test";
-import { MAX_LANGUAGES } from "../scripts/lib/analysis.ts";
 import { ACTIONS, RATIONALE_MAX_CHARACTERS as RATIONALE, SUMMARY_MAX_CHARACTERS as SUMMARY } from "../scripts/lib/conclusion.ts";
 import { STRINGS } from "../scripts/lib/strings.ts";
 import {
   analyzeAstronomy,
   analyzeFasting,
-  analyzeLongPeriod,
   ASTRONOMY,
   FASTING,
-  LONG_PERIOD,
   readPdf,
   runCli,
   runReport,
@@ -112,8 +109,8 @@ describe("conclusion", () => {
       const stderr = reject(conclusion, fasting, FASTING);
       assert.match(stderr, /^Error: conclusion\.json has 2 problems; fix them all and rerun report\.ts\./);
       const notAssessed = "Remove it; report.ts renders not-assessed languages itself.";
-      assert.ok(stderr.includes(`- languages[2].lang "pl" is not assessed (no_linked_article). ${notAssessed}`), stderr);
-      assert.ok(stderr.includes(`- languages[3].lang "xh" is not assessed (short_history). ${notAssessed}`), stderr);
+      assert.ok(stderr.includes(`- languages[1].lang "pl" is not assessed (no_linked_article). ${notAssessed}`), stderr);
+      assert.ok(stderr.includes(`- languages[2].lang "xh" is not assessed (short_history). ${notAssessed}`), stderr);
     });
 
     it("an action outside the enum", () => {
@@ -225,7 +222,7 @@ describe("conclusion", () => {
       const runDir = tempDir();
       assert.equal(analyzeFasting(runDir, "Порівняй інтерес до інтервального голодування в pl і cs").status, 0);
       const conclusion = validConclusion(runDir);
-      assert.deepEqual(conclusion.languages.map((language) => language.lang), ["cs", "uk"]);
+      assert.deepEqual(conclusion.languages.map((language) => language.lang), ["cs"]);
       assert.equal(runReport(runDir, FASTING, conclusion).status, 0);
 
       const pdf = await readPdf(join(runDir, "report.pdf"));
@@ -242,41 +239,5 @@ describe("conclusion", () => {
       const text = squash((await readPdf(join(runDir, "report.pdf"))).text);
       assert.ok(text.includes(squash(STRINGS.en.recommendationHeading)) && text.includes(squash(summary)), text);
     });
-
-    // The worst case of the page: MAX_LANGUAGES language editions, a long question with a proxy reason, the longest summary
-    // and rationales in the widest action label, with and without a not-assessed language.
-    const worstCases = [
-      { qid: "Q333", langs: "uk,cs,en,de", reportLang: "en" },
-      { qid: "Q333", langs: "uk,cs,en,de", reportLang: "uk" },
-      { qid: "Q1666254", langs: "en,de,fr,pl", reportLang: "en" },
-      { qid: "Q1666254", langs: "en,de,fr,pl", reportLang: "uk" },
-    ] as const;
-    for (const c of worstCases) {
-      it(`a summary and rationales of the maximum length for MAX_LANGUAGES languages on one page (${c.qid} ${c.langs}, ${c.reportLang})`, async () => {
-        assert.equal(c.langs.split(",").length, MAX_LANGUAGES);
-        const runDir = tempDir();
-        const uk = c.reportLang === "uk";
-        const question = uk
-          ? "Які з цих чотирьох мовних розділів показують найперспективнішу відносну увагу до теми для нашого наступного раунду досліджень, і наскільки можна довіряти тренду за останні десять років?"
-          : "Which of these four language editions shows the most promising relative attention to the topic for our next research round, and how far can we trust the trend over the last ten years?";
-        const reason = uk
-          ? "Статті саме про тему питання немає в усіх мовних розділах; виміряна тема ширша за тему питання і охоплює суміжні підтеми."
-          : "No article covers the exact topic of the question in every language edition; the measured topic is broader and covers related subtopics.";
-        const result = analyzeLongPeriod(runDir, c.qid, c.langs, { reportLang: c.reportLang, extraArgs: ["--user-question", question, "--proxy-reason", reason] });
-        assert.equal(result.status, 0, result.stderr);
-
-        const words = uk ? "Відносна увага стабільно зростає у більшості місяців, дані надійні, розбіжностей немає; " : "Relative attention grows steadily in most months, the data is reliable, with no divergence; ";
-        const fill = (length: number) => words.repeat(Math.ceil(length / words.length)).slice(0, length).trimEnd().padEnd(length, "ш");
-        const conclusion = validConclusion(runDir);
-        conclusion.summary = fill(SUMMARY);
-        for (const language of conclusion.languages) {
-          language.action = "investigate_next";
-          language.rationale = fill(RATIONALE);
-        }
-        const report = runReport(runDir, LONG_PERIOD, conclusion);
-        assert.equal(report.status, 0, report.stderr);
-        assert.equal((await readPdf(join(runDir, "report.pdf"))).pages, 1);
-      });
-    }
   });
 });

@@ -1,0 +1,30 @@
+{
+  "url": "https://de.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=redirects&rdprop=title&rdnamespace=0&rdlimit=max&titles=Intermittierendes+Fasten",
+  "status": 200,
+  "body": {
+    "batchcomplete": true,
+    "query": {
+      "pages": [
+        {
+          "pageid": 4968928,
+          "ns": 0,
+          "title": "Intermittierendes Fasten",
+          "redirects": [
+            {
+              "ns": 0,
+              "title": "Intervallfasten"
+            },
+            {
+              "ns": 0,
+              "title": "Kurzzeitfasten"
+            }
+          ]
+        }
+      ]
+    },
+    "limits": {
+      "redirects": 500
+    }
+  },
+  "fetched_at": "2026-09-27T13:56:49.578Z"
+}

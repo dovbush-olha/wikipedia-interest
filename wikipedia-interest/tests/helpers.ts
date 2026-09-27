@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import type { Analysis } from "../scripts/lib/analysis.ts";
 import type { Conclusion } from "../scripts/lib/conclusion.ts";
 import { SKILL_DIR } from "../scripts/lib/env.ts";
 
@@ -61,11 +62,11 @@ export function analyzeAstronomy(
   );
 }
 
-// Q1666254 (intermittent fasting) in cs, pl, xh and uk, recorded on 2026-09-27 for the period 2024-09..2026-08,
+// Q1666254 (intermittent fasting) in cs, pl and xh, recorded on 2026-09-27 for the period 2024-09..2026-08,
 // the default period of a fixed "today" of 2026-09-15: pl has no article linked in Wikidata, and the xh article, created on 2025-04-25,
-// has views only from 2025-04. Also recorded: pl and xh alone in English, cs with ua, a language code without a Wikipedia,
-// --topic "Periodic fasting" (en), and eu alone in English: the eu article was renamed from "Aldizkako baraualdi" on 2025-12-02,
-// and its current title has views only from 2025-12.
+// has views only from 2025-04. Also recorded: cs, pl and uk in both report languages, pl and xh alone in English,
+// cs with ua, a language code without a Wikipedia, --topic "Periodic fasting" (en) for cs, pl and eu, and eu alone in English:
+// the eu article was renamed from "Aldizkako baraualdi" on 2025-12-02, and its current title has views only from 2025-12.
 export const FASTING = fixtureEnv("fasting-cs-pl-eu-xh-uk", "2026-09-15");
 
 // Topic search in English Wikipedia for uk, cs and pl, recorded on 2026-09-27: "Mercury" and "learning English" are
@@ -76,7 +77,7 @@ export const TOPIC_SEARCH = fixtureEnv("topic-search-uk-cs-pl", "2026-09-15");
 export function analyzeFasting(
   outDir: string,
   question: string,
-  { reportLang = "uk", langs = "cs,pl,xh,uk" }: { reportLang?: "uk" | "en"; langs?: string } = {},
+  { reportLang = "uk", langs = "cs,pl,xh" }: { reportLang?: "uk" | "en"; langs?: string } = {},
 ): CliResult {
   return runCli(
     "analyze",
@@ -102,9 +103,9 @@ export function analyzeHistory(outDir: string, qid: string, lang: string, report
 }
 
 // 120 months (2016-09..2026-08), recorded on 2026-09-27 with a fixed "today" of 2026-09-15, in both report languages:
-// Q333 (astronomy) in uk, cs, en and de, all assessed, and Q1666254 (intermittent fasting) in en, de, fr and pl,
-// where pl has no article linked in Wikidata. Also recorded in English: Q1666254 in cs, en, de and pl, where cs has a short history.
-export const LONG_PERIOD = fixtureEnv("report-120-months-4-langs", "2026-09-15");
+// Q333 (astronomy) in uk, cs and en, all assessed, and Q1666254 (intermittent fasting) in en, de and pl,
+// where pl has no article linked in Wikidata. Also recorded in English: Q1666254 in cs, en and pl, where cs has a short history.
+export const LONG_PERIOD = fixtureEnv("report-120-months-3-langs", "2026-09-15");
 
 export function analyzeLongPeriod(
   outDir: string,
@@ -117,6 +118,14 @@ export function analyzeLongPeriod(
     ["--qid", qid, "--langs", langs, "--months", "120", "--report-lang", reportLang, "--out-dir", outDir, ...extraArgs],
     LONG_PERIOD,
   );
+}
+
+/** Rewrites the run's analysis.json: for the report states no recorded fixture has, such as a raw/relative divergence. */
+export function editAnalysis(runDir: string, edit: (analysis: Analysis) => void): void {
+  const file = join(runDir, "analysis.json");
+  const analysis = JSON.parse(readFileSync(file, "utf8")) as Analysis;
+  edit(analysis);
+  writeFileSync(file, JSON.stringify(analysis, null, 2));
 }
 
 /** A conclusion.json that passes every check: one entry per assessed language of the run's analysis.json. */
