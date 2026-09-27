@@ -46,6 +46,21 @@ const en = {
   viewsPerMillionNote:
     "Views per million: median monthly views of the article per million human views of its language edition over the last 12 months. " +
     "It compares relative attention inside Wikipedia, not the number of people, population or willingness to pay.",
+  notAssessedHeading: "Not assessed",
+  notAssessedNote:
+    "Not enough Wikipedia data to assess the topic over the whole requested period. " +
+    "These language editions are not ranked with the assessed ones, and this does not mean low attention.",
+  noLinkedArticle:
+    "No article in this language edition is linked to this Wikidata item. The topic may be covered in another article or section. " +
+    "This method cannot assess relative attention to the topic in this language edition. This means neither low nor high attention.",
+  shortHistory: (title: string, available: number, requested: number) =>
+    available === 0
+      ? `The article “${title}” has no views data in the requested period, so the topic cannot be assessed over it.`
+      : `Views of the article “${title}” exist only for the last ${available} of the ${requested} requested months, ` +
+        "so the topic cannot be assessed over the whole period.",
+  zeroBaseline: (compares: GrowthCompares) =>
+    `The median relative attention of the first 12 months (${range(compares.first_12_months)}) is zero, ` +
+    "so there is nothing to compare its change against.",
   period: "Period",
   generated: "Generated",
   source: "Source: Wikimedia Pageviews API (monthly, all-access, user), Wikidata",
@@ -84,6 +99,21 @@ const uk: Strings = {
   viewsPerMillionNote:
     "Переглядів на мільйон: медіана місячних переглядів статті на мільйон переглядів людьми її мовного розділу за останні 12 місяців. " +
     "Порівнює відносну увагу всередині Wikipedia, а не кількість людей, населення чи готовність платити.",
+  notAssessedHeading: "Не оцінено",
+  notAssessedNote:
+    "Недостатньо Wikipedia-даних, щоб оцінити тему за весь запитаний період. " +
+    "Ці мовні розділи не ранжуються разом з оціненими, і це не означає низької уваги.",
+  noLinkedArticle:
+    "У цьому мовному розділі немає статті, пов'язаної з цим поняттям Wikidata. Тема може бути описана в іншій статті або розділі. " +
+    "За цією методикою оцінити відносну увагу до теми в цьому мовному розділі неможливо. Це не означає ні низької, ні високої уваги.",
+  shortHistory: (title, available, requested) =>
+    available === 0
+      ? `Для статті «${title}» немає даних про перегляди в запитаному періоді, тож оцінити тему за нього неможливо.`
+      : `Дані про перегляди статті «${title}» є лише за останні ${available} з ${requested} міс. запитаного періоду, ` +
+        "тож оцінити тему за весь період неможливо.",
+  zeroBaseline: (compares) =>
+    `Медіана відносної уваги за перші 12 місяців (${range(compares.first_12_months)}) дорівнює нулю, ` +
+    "тож зміну немає з чим порівняти.",
   period: "Період",
   generated: "Згенеровано",
   source: "Джерело: Wikimedia Pageviews API (помісячно, all-access, user), Wikidata",

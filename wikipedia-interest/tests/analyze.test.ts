@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { analyzeAstronomy as analyzeAstronomyWith, ASTRONOMY, fixtureEnv, noNetworkEnv, runCli, tempDir } from "./helpers.ts";
+import { analyzeAstronomy as analyzeAstronomyWith, analyzeFasting, ASTRONOMY, fixtureEnv, noNetworkEnv, runCli, tempDir } from "./helpers.ts";
 
 // Seam A: the analyze CLI, replaying recorded Wikimedia responses offline.
 const QUESTION = "Чи зростає інтерес до астрономії в україномовній Wikipedia?";
@@ -132,6 +132,77 @@ describe("analyze --qid", () => {
 
     assert.equal(result.status, 1);
     assert.match(result.stderr, /^Error: --out-dir .* is inside the skill folder/);
+  });
+});
+
+describe("analyze insufficient data", () => {
+  const question = "Порівняй зростання інтересу до інтервального голодування в pl і cs за останні два роки";
+
+  it("marks a language edition without an article linked to the measured topic as no_linked_article", () => {
+    const outDir = tempDir();
+    const result = analyzeFasting(outDir, question);
+    assert.equal(result.status, 0, result.stderr);
+
+    const pl = JSON.parse(result.stdout).languages.find((l: { lang: string }) => l.lang === "pl");
+    assert.deepEqual(pl, {
+      lang: "pl",
+      title: null,
+      data_status: "insufficient_data",
+      reason: "no_linked_article",
+      trend: null,
+      trend_reliability: null,
+    });
+    assert.deepEqual(analysisIn(outDir).languages[1], pl);
+  });
+
+  it("marks an article younger than the requested period as short_history with the months available up to --end", () => {
+    const outDir = tempDir();
+    const result = analyzeFasting(outDir, question);
+    assert.equal(result.status, 0, result.stderr);
+
+    // The eu article has views from 2025-12: 2025-12..2026-08 is 9 of the 24 requested months.
+    const eu = JSON.parse(result.stdout).languages.find((l: { lang: string }) => l.lang === "eu");
+    assert.deepEqual(eu, {
+      lang: "eu",
+      title: "Aldizkako barau",
+      data_status: "insufficient_data",
+      reason: "short_history",
+      max_months_available: 9,
+      trend: null,
+      trend_reliability: null,
+    });
+    // Not silently analyzed over a shorter period: no series and no metrics.
+    assert.deepEqual(analysisIn(outDir).languages[2], eu);
+  });
+
+  it("keeps assessing the other languages over the whole requested period, in the --langs order", () => {
+    const outDir = tempDir();
+    const result = analyzeFasting(outDir, question);
+    assert.equal(result.status, 0, result.stderr);
+
+    const out = JSON.parse(result.stdout);
+    assert.deepEqual(out.period, { start: "2024-09", end: "2026-08", months: 24 });
+    assert.deepEqual(
+      out.languages.map((l: { lang: string; data_status: string }) => [l.lang, l.data_status]),
+      [
+        ["cs", "ok"],
+        ["pl", "insufficient_data"],
+        ["eu", "insufficient_data"],
+        ["uk", "ok"],
+      ],
+    );
+    for (const i of [0, 3]) {
+      assert.equal(analysisIn(outDir).languages[i].series.length, 24);
+      assert.ok(["up", "down", "flat"].includes(out.languages[i].trend));
+    }
+  });
+
+  it("still fails for a language code without a Wikipedia, instead of reporting no linked article", () => {
+    const result = analyzeFasting(tempDir(), question, { langs: "cs,ua" });
+
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, /^Error: Wikimedia has no pageviews for ua\.wikipedia\. Check the language code in --langs\./);
   });
 });
 
@@ -309,6 +380,7 @@ const EXPECTED_VIEWS_PER_MILLION = { uk: 7.91, cs: 8.72, pl: 6.1 };
 const EXPECTED_TREND_METRICS = [
   {
     lang: "uk",
+    data_status: "ok",
     relative_attention_growth_pct: -47.2,
     raw_growth_pct: -63,
     edition_growth_pct: -28.2,
@@ -321,6 +393,7 @@ const EXPECTED_TREND_METRICS = [
   },
   {
     lang: "cs",
+    data_status: "ok",
     relative_attention_growth_pct: -23.1,
     raw_growth_pct: -34.6,
     edition_growth_pct: -16.1,
@@ -333,6 +406,7 @@ const EXPECTED_TREND_METRICS = [
   },
   {
     lang: "pl",
+    data_status: "ok",
     relative_attention_growth_pct: -29.6,
     raw_growth_pct: -36.8,
     edition_growth_pct: -11.9,

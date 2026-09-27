@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { ANALYSIS_FILE, MAX_LANGUAGES, REPORT_LANGS, type Analysis, type LanguageResult, type ReportLang } from "./lib/analysis.ts";
 import { parseCliArgs, printJson, runMain, UserError } from "./lib/cli.ts";
 import { isInsideSkillDir, SKILL_DIR, today } from "./lib/env.ts";
-import { growthCompares, languageMetrics } from "./lib/metrics.ts";
+import { growthCompares, insufficientData, languageMetrics } from "./lib/metrics.ts";
 import { articleViews, editionViews } from "./lib/pageviews.ts";
 import { monthsOf, requestedPeriod, type Period } from "./lib/period.ts";
 import { resolveQid } from "./lib/resolve.ts";
@@ -54,7 +54,7 @@ await runMain(async () => {
   const asOf = today();
   const period = requestedPeriod({ start: args.start, end: args.end, months: args.months }, asOf);
   const { topic, titles } = await resolveQid(qid, langs, reportLang);
-  const languages = await allInOrder(langs.map((lang) => analyzeLanguage(lang, titles.get(lang) ?? null, topic.qid, period)));
+  const languages = await allInOrder(langs.map((lang) => analyzeLanguage(lang, titles.get(lang) ?? null, period)));
 
   const analysis: Analysis = {
     status: "ok",
@@ -72,23 +72,26 @@ await runMain(async () => {
 
   printJson({
     ...analysis,
-    languages: languages.map(({ series: _series, ...summary }) => summary),
+    languages: languages.map(withoutSeries),
     files: { analysis: analysisFile },
     next_step: `Run: node ${join(SKILL_DIR, "scripts", "report.ts")} --run-dir ${outDir}`,
   });
 });
 
-async function analyzeLanguage(lang: string, title: string | null, qid: string, period: Period): Promise<LanguageResult> {
-  if (title === null) {
-    throw new UserError(
-      `${qid} has no article linked in ${lang}.wikipedia, so relative attention cannot be measured there; ` +
-        `this says nothing about interest. Rerun without ${lang} and tell the user ${lang} could not be assessed.`,
-    );
-  }
+async function analyzeLanguage(lang: string, title: string | null, period: Period): Promise<LanguageResult> {
   // Edition first: it fails while the --end month is unpublished, before the article's incomplete views get cached for good.
+  // Also without a linked article, so a mistyped language code fails instead of reading as "no linked article".
   const edition = await editionViews(lang, period);
+  if (title === null) return { lang, title, ...insufficientData({ reason: "no_linked_article" }) };
   const article = await articleViews(lang, title, period);
   return { lang, title, ...languageMetrics(monthsOf(period), article, edition) };
+}
+
+/** A language result for stdout: the monthly series stay in analysis.json. */
+function withoutSeries(language: LanguageResult): Omit<LanguageResult, "series"> {
+  if (language.data_status !== "ok") return language;
+  const { series: _series, ...summary } = language;
+  return summary;
 }
 
 /** Like Promise.all, but a failure is always the first one in input order, not whichever settled first. */

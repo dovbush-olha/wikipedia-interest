@@ -1,0 +1,90 @@
+{
+  "url": "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/eu.wikipedia/all-access/user/Aldizkako_barau/monthly/2024090100/2026083100",
+  "status": 200,
+  "body": {
+    "items": [
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2025120100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 3
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026010100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 11
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026020100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 7
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026030100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026040100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026050100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 4
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026060100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 9
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026070100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 5
+      },
+      {
+        "project": "eu.wikipedia",
+        "article": "Aldizkako_barau",
+        "granularity": "monthly",
+        "timestamp": "2026080100",
+        "access": "all-access",
+        "agent": "user",
+        "views": 2
+      }
+    ]
+  },
+  "fetched_at": "2026-09-27T08:14:55.806Z"
+}
