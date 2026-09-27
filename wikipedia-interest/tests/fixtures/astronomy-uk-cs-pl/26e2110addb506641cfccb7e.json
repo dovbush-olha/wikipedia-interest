@@ -1,0 +1,53 @@
+{
+  "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&ids=Q333&props=labels%7Cdescriptions%7Csitelinks&languages=uk%7Cen&sitefilter=ukwiki%7Ccswiki%7Cplwiki",
+  "status": 200,
+  "body": {
+    "entities": {
+      "Q333": {
+        "type": "item",
+        "id": "Q333",
+        "labels": {
+          "en": {
+            "language": "en",
+            "value": "astronomy"
+          },
+          "uk": {
+            "language": "uk",
+            "value": "астрономія"
+          }
+        },
+        "descriptions": {
+          "en": {
+            "language": "en",
+            "value": "natural science studying celestial objects and phenomena in the cosmos"
+          },
+          "uk": {
+            "language": "uk",
+            "value": "одна з найдавніших наук, що включає спостереження і пояснення подій, які відбуваються за межами Землі та її атмосфери"
+          }
+        },
+        "sitelinks": {
+          "cswiki": {
+            "site": "cswiki",
+            "title": "Astronomie",
+            "badges": []
+          },
+          "plwiki": {
+            "site": "plwiki",
+            "title": "Astronomia",
+            "badges": [
+              "Q17437798"
+            ]
+          },
+          "ukwiki": {
+            "site": "ukwiki",
+            "title": "Астрономія",
+            "badges": []
+          }
+        }
+      }
+    },
+    "success": 1
+  },
+  "fetched_at": "2026-09-26T16:09:08.147Z"
+}

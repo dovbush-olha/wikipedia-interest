@@ -1,0 +1,5 @@
+node_modules/
+# Wikimedia API response cache (tests/fixtures/ holds the recorded responses that are committed)
+.cache/
+.DS_Store
+*.log
