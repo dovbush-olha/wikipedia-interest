@@ -10,38 +10,45 @@ const Y_INTERVALS = 5;
 const X_STEPS = [1, 3, 6, 12, 24, 60, 120];
 /** The least room between two neighbouring x labels, in points. */
 const X_LABEL_GAP = 8;
+/** The room between the right edge of a y label and the plot, in points. */
+const Y_LABEL_GAP = 6;
 
 export type ChartArea = { left: number; top: number; width: number; height: number };
 /** One language edition: its indexed relative attention per month; null is a month without a value. */
 export type ChartSeries = { lang: string; values: (number | null)[] };
+/** Widths of the axis labels in the chart's font: a month label (YYYY-MM), centred on its tick, and the label of a y tick value. */
+export type LabelWidths = { xWidth: number; yWidth: (value: number) => number };
 export type Point = { x: number; y: number };
 export type ChartGeometry = {
+  /** The frame without the y labels at its left: the months span its width, the domain its height. */
+  plot: ChartArea;
   /** From the lowest to the highest y tick: every value and the baseline are inside it. */
   domain: { min: number; max: number };
-  yTicks: { value: number; y: number }[];
+  /** `labelRight` is where the tick's label ends, right-aligned before the plot. */
+  yTicks: { value: number; y: number; labelRight: number }[];
   xTicks: { month: string; x: number }[];
   baselineY: number;
-  /** A line per language, broken into segments at months without a value. */
+  /** A line per language edition, broken into segments at months without a value. */
   series: { lang: string; segments: Point[][] }[];
 };
 
-/** `xLabelWidth` is the width of one month label (YYYY-MM), centred on its tick. */
-export function chartGeometry(months: string[], series: ChartSeries[], area: ChartArea, xLabelWidth: number): ChartGeometry {
+/** The geometry of `series` over `months` (at least 2) in `frame`, which also holds the y labels at its left. */
+export function chartGeometry(months: string[], series: ChartSeries[], frame: ChartArea, labels: LabelWidths): ChartGeometry {
+  if (months.length < 2) throw new Error(`a chart needs at least 2 months, got ${months.length}`);
   const { domain, step } = yScale(series.flatMap((s) => s.values.filter((value) => value !== null)));
-  const bottom = area.top + area.height;
-  const y = (value: number) => bottom - ((value - domain.min) / (domain.max - domain.min)) * area.height;
-  const x = (i: number) => area.left + (i * area.width) / (months.length - 1);
+  const tickValues = Array.from({ length: Math.round((domain.max - domain.min) / step) + 1 }, (_, i) => domain.min + i * step);
+  const gutter = Math.max(...tickValues.map(labels.yWidth)) + Y_LABEL_GAP;
+  const plot = { ...frame, left: frame.left + gutter, width: frame.width - gutter };
 
-  const ticks = Math.round((domain.max - domain.min) / step);
-  const yTicks = Array.from({ length: ticks + 1 }, (_, i) => {
-    const value = domain.min + i * step;
-    return { value, y: y(value) };
-  });
+  const bottom = plot.top + plot.height;
+  const y = (value: number) => bottom - ((value - domain.min) / (domain.max - domain.min)) * plot.height;
+  const x = (i: number) => plot.left + (i * plot.width) / (months.length - 1);
 
   return {
+    plot,
     domain,
-    yTicks,
-    xTicks: xTicks(months, x, area, xLabelWidth),
+    yTicks: tickValues.map((value) => ({ value, y: y(value), labelRight: plot.left - Y_LABEL_GAP })),
+    xTicks: xTicks(months, x, plot, labels.xWidth),
     baselineY: y(BASELINE_INDEX),
     series: series.map(({ lang, values }) => ({ lang, segments: segments(values, (value, i) => ({ x: x(i), y: y(value) })) })),
   };

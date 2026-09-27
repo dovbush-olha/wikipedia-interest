@@ -275,11 +275,11 @@ describe("report", () => {
     assert.ok(text.indexOf(squash("(Q333)")) < text.indexOf(squash(STRINGS.uk.chartTitle)), pdf.text);
     const chart = chartText(text, "uk");
     assert.ok(chart.includes(squash("100 = медіана за 2024-09 - 2025-08")), chart);
-    // Quarterly month labels of the 24-month period, and one legend entry per language code.
+    // Quarterly month labels of the 24-month period, and one legend entry per language edition code.
     for (const label of ["2024-10", "2025-01", "2026-07", "uk", "cs", "pl"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
   });
 
-  it("keeps a chart of 6 assessed languages over 120 months, a long question and a proxy on one page", async () => {
+  it("keeps a chart of 6 assessed language editions over 120 months, a long question and a proxy on one page", async () => {
     const runDir = tempDir();
     const question =
       "Which of these six language editions shows the most promising relative attention to astronomy for our next research round, " +
@@ -296,7 +296,7 @@ describe("report", () => {
     for (const label of ["2017-01", "2026-01", "uk", "cs", "pl", "en", "de", "fr"]) assert.ok(chart.includes(label), `${label} in ${chart}`);
   });
 
-  it("leaves not-assessed languages off the chart", async () => {
+  it("leaves not-assessed language editions off the chart", async () => {
     const runDir = tempDir();
     const result = analyzeLongPeriod(runDir, "Q1666254", "cs,uk,en,de,fr,pl", ["--user-question", "Where is intermittent fasting gaining attention?"]);
     assert.equal(result.status, 0, result.stderr);

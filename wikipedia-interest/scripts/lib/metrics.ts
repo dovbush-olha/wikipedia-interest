@@ -204,7 +204,7 @@ export function indexedAttention(series: MonthPoint[]): number[] {
   return relative.map((value) => (value / baseline) * BASELINE_INDEX);
 }
 
-// Unrounded: in a large edition, rounding to the series' 3 decimals would distort growth, tie months and zero the baseline.
+/** Unrounded: in a large edition, rounding to the series' 3 decimals would distort growth, tie months and zero the baseline. */
 function unroundedAttention(series: MonthPoint[]): number[] {
   return series.map((point) => (point.article_views / point.edition_views) * PER_MILLION);
 }

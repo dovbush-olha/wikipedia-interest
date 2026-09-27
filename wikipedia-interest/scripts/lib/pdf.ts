@@ -60,9 +60,11 @@ export async function renderReport(analysis: Analysis, generatedOn: string): Pro
   if (assessed.length > 0) {
     // Only assessed languages have a baseline to index to; the others are named in their group under the table.
     const series = assessed.map((language) => ({ lang: language.lang, values: indexedAttention(language.series) }));
-    const text = { title: t.chartTitle, baseline: t.chartBaseline(analysis.growth_compares), ink: INK, muted: MUTED, rule: RULE };
+    const labels = { title: t.chartTitle, baseline: t.chartBaseline(analysis.growth_compares) };
     const tick = new Intl.NumberFormat(analysis.report_lang, { maximumFractionDigits: 0 });
-    drawChart(doc, monthsOf(period), series, text, (value) => tick.format(value), MARGIN, doc.y + doc.currentLineHeight(), width);
+    const ink = { text: INK, muted: MUTED, rule: RULE };
+    const top = doc.y + doc.currentLineHeight();
+    drawChart(doc, monthsOf(period), series, labels, ink, (value) => tick.format(value), { left: MARGIN, top, width });
     doc.fontSize(10).moveDown(0.8);
     drawLanguageTable(doc, assessed, analysis, languageName, t, width);
     doc.moveDown(0.8).fillColor(MUTED).fontSize(8);
