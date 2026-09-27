@@ -113,6 +113,25 @@ describe("conclusion", () => {
       assert.ok(stderr.includes(`- languages[2].lang "xh" is not assessed (short_history). ${notAssessed}`), stderr);
     });
 
+    it("a text that names a not-assessed language edition, by its code or its name, in either report language", () => {
+      const mention = (text: string, field = "summary") => {
+        const conclusion = validConclusion(fasting);
+        if (field === "summary") conclusion.summary = text;
+        else conclusion.languages[0].rationale = text;
+        return reject(conclusion, fasting, FASTING);
+      };
+      const remove = "Remove it: the PDF shows not-assessed language editions itself.";
+      assert.ok(
+        mention("Відносна увага знизилась у чеському розділі; польський розділ не оцінено.").startsWith(
+          `Error: summary names the not-assessed language edition pl ("польський розділ"). ${remove}`,
+        ),
+      );
+      assert.match(mention("Порівняння з польськомовною Wikipedia неможливе."), /summary names the not-assessed language edition pl \("польськомовн/);
+      assert.match(mention("Relative attention fell in Czech; the Polish Wikipedia has no article."), /edition pl \("Polish Wikipedia"\)/);
+      assert.match(mention("Для pl оцінки немає."), /edition pl \("pl"\)/);
+      assert.match(mention("Тренд надійніший, ніж у xh.", "rationale"), /^Error: languages\[0\]\.rationale names the not-assessed language edition xh \("xh"\)/);
+    });
+
     it("an action outside the enum", () => {
       assert.match(reject(withEntry(2, { action: "deprioritize" })), /^Error: languages\[2\]\.action "deprioritize" is not allowed\. Use one of: investigate_next, consider, lower_priority\./);
       assert.ok(reject(withEntry(0, { action: undefined })).includes(`languages[0].action is missing. Use one of: ${ALLOWED_ACTIONS}.`));
@@ -224,6 +243,9 @@ describe("conclusion", () => {
       const conclusion = validConclusion(runDir);
       assert.deepEqual(conclusion.languages.map((language) => language.lang), ["cs"]);
       assert.equal(runReport(runDir, FASTING, conclusion).status, 0);
+      // Names of assessed editions and a language as a topic are not a mention of a not-assessed edition.
+      conclusion.summary = "Відносна увага до польської кухні знизилась у чеському розділі та чеськомовній Wikipedia, as in the Czech edition.";
+      assert.equal(runReport(runDir, FASTING, conclusion).status, 0, "names of assessed editions");
 
       const pdf = await readPdf(join(runDir, "report.pdf"));
       assert.equal(pdf.pages, 1);

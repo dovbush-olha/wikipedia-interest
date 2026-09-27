@@ -54,7 +54,7 @@ node "${CLAUDE_SKILL_DIR}/scripts/analyze.ts" --topic "Intermittent fasting" --t
 ```
 
 - `--user-question`: the user's message word for word, copied from the user's message, not from your own words or the skill arguments.
-  Never shorten, translate or rephrase it: "вивчення англійської" must not become «англійська мова».
+  Never shorten, translate or rephrase it: "вивчення англійської" must not become "англійська мова".
   For a follow-up, the original question plus the change in a few words.
 - `--report-lang`: `uk` when the user writes in Ukrainian, otherwise `en`.
   It is the language of the PDF, of `conclusion.json` and of your answer in the chat.
